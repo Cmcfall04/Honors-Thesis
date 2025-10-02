@@ -1,11 +1,11 @@
-# 📌 Thesis Project To-Do List
+# Thesis Project To-Do List
 
-This document tracks improvements and next steps for the Apple Stock Sentiment Analysis tool (`main.py`).  
-Goal: Build a complete pipeline from **headlines → sentiment → daily features → stock movement prediction**.
+This document tracks improvements and next steps for the Apple Stock Sentiment Analysis tool (`main.py`).
+Goal: Build a complete pipeline from **headlines + sentiment + daily features + stock movement prediction**.
 
 ---
 
-## ✅ Completed
+## Completed
 - [x] Downloaded stock data using `yfinance`.
 - [x] Scraped Apple-related headlines from Yahoo Finance.
 - [x] Filtered headlines with Apple-specific keywords.
@@ -15,92 +15,59 @@ Goal: Build a complete pipeline from **headlines → sentiment → daily feature
 
 ---
 
-## 🔄 To-Do (Next Steps)
+## To-Do (Next Steps)
 
 ### 1. Data Collection Improvements
-- [ ] **Add headline dates**  
-  - Parse `<time>` elements from Yahoo Finance (if available).  
-  - If not available, fallback = current scrape date (less accurate).  
-  - Store alongside headlines in DataFrame.  
-
-- [ ] **Handle empty headline cases gracefully**  
-  - Already partially covered with `apple_headlines = []`.  
-  - Expand to log when no data is found and retry scraping.  
-
-- [ ] **Integrate Historical Headlines**  
-  - Explore sources to move beyond "current headlines only":
-    - **Kaggle datasets**: e.g., *Financial News for Stock Prediction*, *Stock Market News Dataset*.  
-    - **NewsAPI** (free tier, allows limited historical queries).  
-    - **Alpha Vantage News API** (check free tier).  
-    - **University library subscriptions**: Factiva, ProQuest, Bloomberg, WSJ.  
-  - Download or query headlines covering at least **6–12 months**.  
-  - Standardize data format into:  
-    ```
-    Date | Headline
-    ```
-  - Run FinBERT sentiment analysis on this dataset (batch processing).
-  - Merge with stock price data (`yfinance`) across the same date range.
+- [x] Add headline dates
+  - Parse `<time>` elements from Yahoo Finance when possible.
+  - Fallback to current scrape date when `<time>` is unavailable.
+  - Store alongside headlines in DataFrame (implemented in `main.py`).
+- [x] Handle empty headline cases gracefully
+  - Added multi-attempt scrape retries with logging when no data is found.
+  - Exits cleanly after the configured retry count.
+- [ ] Integrate historical headlines
+  - [x] Seeded `data/historical_headlines.csv` with 2025 sample headlines.
+  - [x] Automated FinBERT batch sentiment scoring to `historical_sentiment_analysis.csv`.
+  - [ ] Acquire extended historical headline source (Kaggle, NewsAPI, Alpha Vantage, library DBs).
+  - [ ] Merge with stock price data (`yfinance`) across the same date range once a real dataset is sourced.
 
 ---
 
 ### 2. Data Processing
-- [ ] **Aggregate daily sentiment scores**  
-  - Group headlines by date.  
-  - Compute average positive, negative, and neutral scores per day.  
-  - Example schema:  
-    ```
-    Date | Avg_Positive | Avg_Negative | Avg_Neutral
-    ```
-
-- [ ] **Merge with stock data**  
-  - Align daily sentiment with `yfinance` daily close prices.  
-  - Create label `Stock_Move`:  
-    - `1` if next-day close > today’s close.  
-    - `0` otherwise.  
-
-- [ ] **Export merged dataset**  
-  - Save as `sentiment_stock_dataset.csv`.  
-  - Columns:  
-    ```
-    Date | Avg_Positive | Avg_Negative | Avg_Neutral | Stock_Move
-    ```
+- [x] Aggregate daily sentiment scores
+  - Combined live + historical sentiment into daily averages with headline counts.
+  - Output preview saved to console for validation.
+- [x] Merge with stock data
+  - Joined daily sentiment with AAPL closes and derived the `stock_move` label (next-day close).
+- [x] Export merged dataset
+  - Saved as `sentiment_stock_dataset.csv` including averages, headline counts, close prices, and labels.
 
 ---
 
 ### 3. Modeling
-- [ ] **Build first baseline classifier**  
-  - Use `LogisticRegression` from scikit-learn.  
-  - Features: `[Avg_Positive, Avg_Negative, Avg_Neutral]`.  
-  - Label: `Stock_Move`.  
-
-- [ ] **Evaluate model performance**  
-  - Accuracy score.  
-  - Precision, Recall, F1-score.  
-  - Confusion matrix.  
-  - Compare against baseline (random 50/50 guess).  
-
-- [ ] **Save results**  
-  - Export metrics to a `results.md` or `results.csv` file.  
-  - Visualize confusion matrix with `matplotlib`.  
+- [x] Build first baseline classifier
+  - Trained `LogisticRegression` on `[Avg_Positive, Avg_Negative, Avg_Neutral]` features.
+- [x] Evaluate model performance
+  - Logged accuracy, precision, recall, F1, and confusion matrix metrics.
+- [x] Save results
+  - Exported metrics to `model_results.md` and confusion matrix to `confusion_matrix.png`.
 
 ---
 
 ### 4. Enhancements (Future Phases)
-- [ ] **Support multiple tickers** (AAPL, MSFT, AMZN, etc.).  
-- [ ] **Add simple technical indicators** (e.g., moving averages, RSI, trading volume).  
-- [ ] **Run experiments**  
-  - Sentiment-only vs. Sentiment+Technical Indicators.  
-  - Different lookahead windows (same-day vs. next-day vs. 2-day).  
-- [ ] **Error handling + logging**  
-  - Log failed scrapes.  
-  - Add retries for HTTP errors.  
+- [ ] Support multiple tickers (AAPL, MSFT, AMZN, etc.).
+- [ ] Add simple technical indicators (e.g., moving averages, RSI, trading volume).
+- [ ] Run experiments
+  - Sentiment-only vs. Sentiment+Technical Indicators.
+  - Different lookahead windows (same-day vs. next-day vs. 2-day).
+- [ ] Error handling + logging
+  - Log failed scrapes.
+  - Add retries for HTTP errors.
 
 ---
 
-## 📝 Notes for Thesis Write-Up
-- Justify use of **headlines (not full articles)** as main sentiment source.  
-- Acknowledge limitations (scraping instability, noise, small data volume).  
-- Propose **full-article analysis + premium datasets** as future work.  
-- Document baseline model setup and evaluation clearly for reproducibility.  
-
----
+## Notes for Thesis Write-Up
+- Justify use of **headlines (not full articles)** as main sentiment source.
+- Acknowledge limitations (scraping instability, noise, small data volume).
+- Propose **full-article analysis + premium datasets** as future work.
+- Document baseline model setup and evaluation clearly for reproducibility.

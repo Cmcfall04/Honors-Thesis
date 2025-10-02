@@ -1,144 +1,543 @@
-# import the necessary libraries
-import yfinance as yf
-import requests
-from bs4 import BeautifulSoup
+"""Apple stock sentiment analysis pipeline.
+
+This module pulls live Apple news headlines, scores them with FinBERT, merges
+those signals with historical price data, and trains a baseline logistic
+regression model to predict next-day stock movement.
+"""
+
+import time
+from pathlib import Path
+from typing import Dict, List, Sequence
+
+import matplotlib.pyplot as plt
 import pandas as pd
+import requests
 import torch
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import yfinance as yf
+from bs4 import BeautifulSoup
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import (
+    ConfusionMatrixDisplay,
+    accuracy_score,
+    classification_report,
+    confusion_matrix,
+    precision_recall_fscore_support,
+)
+from sklearn.model_selection import train_test_split
+from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-# define the stock symbol
-stock_symbol = "AAPL"
+# --- Configuration -----------------------------------------------------------------
+# Stock symbol and backtest window used by the pipeline.
+STOCK_SYMBOL = "AAPL"
+START_DATE = "2025-01-01"
+END_DATE = "2025-09-01"
 
-# get the stock data
-stock_data = yf.download(stock_symbol, start="2025-01-01", end="2025-09-01")
+# Yahoo Finance quote page used for scraping live headlines.
+QUOTE_URL = "https://finance.yahoo.com/quote/AAPL/"
 
-# print the stock data
-#print(stock_data.head())
-
-#create csv file to see whats in it
-#stock_data.to_csv("stock_data.csv")
-
-# Scrape from yahoo finance
-url = "https://finance.yahoo.com/quote/AAPL/"
-
-# Add headers to make request look like a real browser
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+# Browser-style headers help us avoid being blocked by basic bot detection.
+REQUEST_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/91.0.4472.124 Safari/537.36"
+    )
 }
 
-try:
-    response = requests.get(url, headers=headers)
-    response.raise_for_status()  # Raises an HTTPError for bad responses
-    soup = BeautifulSoup(response.text, "html.parser")
-    
-    # Try multiple selectors that Yahoo Finance might use for headlines
-    headlines = []
-    
-    # Look for various headline selectors specifically for news
-    selectors = [
-        'h3[data-testid="clamp-container"]',
-        '[data-testid="title"]',
-        'div[data-testid="news-stream"] h3',
-        '.js-content-viewer h3',
-        'a[data-testid="title-link"]',
-        '.news-item h3',
-        '.stream-item h3'
-    ]
-    
-    for selector in selectors:
-        elements = soup.select(selector)
-        if elements:
-            headlines.extend([elem.get_text().strip() for elem in elements])
-            break  # Stop after finding headlines with the first working selector
-    
-    if headlines:
-        # Filter headlines to only include Apple-related news
-        apple_keywords = ['apple', 'aapl', 'iphone', 'ipad', 'mac', 'tim cook', 'cupertino']
-        apple_headlines = []
-        
-        for headline in headlines:
-            if any(keyword.lower() in headline.lower() for keyword in apple_keywords):
-                apple_headlines.append(headline)
-        
-        if apple_headlines:
-            print(f"Found {len(apple_headlines)} Apple-related headlines:")
-            for i, headline in enumerate(apple_headlines, 1):
-                print(f"{i}. {headline}")
-        else:
-            print("No Apple-specific headlines found in the scraped data.")
-            print(f"Total headlines found: {len(headlines)}")
-    else:
-        print("No headlines found. The page structure might have changed.")
-        # Debug: Let's see what we actually got
-        print("Page title:", soup.title.text if soup.title else "No title found")
-        print("First few div elements:")
-        divs = soup.find_all('div')[:5]
-        for div in divs:
-            if div.get_text().strip():
-                print(f"- {div.get_text().strip()[:100]}...")
+# Keywords used to filter scraped headlines down to Apple-specific stories.
+APPLE_KEYWORDS = [
+    "apple",
+    "aapl",
+    "iphone",
+    "ipad",
+    "mac",
+    "tim cook",
+    "cupertino",
+]
 
-except requests.RequestException as e:
-    print(f"Error fetching the page: {e}")
-    apple_headlines = []  # Initialize empty list if scraping fails
-except Exception as e:
-    print(f"Error parsing the page: {e}")
-    apple_headlines = []  # Initialize empty list if scraping fails
+# CSS selectors evaluated in order until a viable headline container is found.
+HEADLINE_SELECTORS = [
+    'h3[data-testid="clamp-container"]',
+    '[data-testid="title"]',
+    'div[data-testid="news-stream"] h3',
+    '.js-content-viewer h3',
+    'a[data-testid="title-link"]',
+    '.news-item h3',
+    '.stream-item h3',
+]
 
-# Load FinBERT model for sentiment analysis
-print("\nLoading FinBERT model for sentiment analysis...")
-try:
+# Number of times we retry a scrape before giving up and the delay between tries.
+SCRAPE_RETRIES = 3
+RETRY_DELAY_SECONDS = 3
+
+# Files produced/consumed by the pipeline.
+HISTORICAL_HEADLINES_PATH = Path("data/historical_headlines.csv")
+HISTORICAL_SENTIMENT_OUTPUT = Path("historical_sentiment_analysis.csv")
+AGGREGATED_DATA_OUTPUT = Path("sentiment_stock_dataset.csv")
+MODEL_RESULTS_PATH = Path("model_results.md")
+CONFUSION_MATRIX_PATH = Path("confusion_matrix.png")
+
+# Output label order produced by the FinBERT model.
+LABELS = ["positive", "negative", "neutral"]
+
+
+# --- Data collection -----------------------------------------------------------------
+def fetch_stock_data(symbol: str, start: str, end: str) -> pd.DataFrame:
+    """Download historical stock data for the requested ticker and range."""
+    print(f"Downloading {symbol} stock data from {start} to {end}...")
+    data = yf.download(symbol, start=start, end=end)
+    if data.empty:
+        print("Warning: received empty stock dataset. Verify the requested date range.")
+        return data
+
+    # yfinance sometimes returns a column MultiIndex; flatten it for easier joins.
+    if isinstance(data.columns, pd.MultiIndex):
+        data.columns = [col[0] if isinstance(col, tuple) else col for col in data.columns.to_list()]
+    return data
+
+
+def extract_headline_date(headline_tag, fallback_date: pd.Timestamp) -> pd.Timestamp:
+    """Try to locate a <time> tag near the headline and parse it into a date."""
+    candidate = None
+    search_tag = headline_tag
+    # Walk up the DOM a few levels to find a sibling <time> element sometimes used by Yahoo.
+    for _ in range(4):
+        if search_tag is None:
+            break
+        candidate = search_tag.find("time")
+        if candidate:
+            break
+        search_tag = getattr(search_tag, "parent", None)
+
+    # Fall back to earlier or later siblings if no direct child is available.
+    if not candidate:
+        sibling = headline_tag.find_previous("time")
+        if sibling and sibling.parent == headline_tag.parent:
+            candidate = sibling
+
+    if not candidate:
+        sibling = headline_tag.find_next("time")
+        if sibling and sibling.parent == headline_tag.parent:
+            candidate = sibling
+
+    if candidate:
+        datetime_attr = candidate.get("datetime")
+        text_value = candidate.get_text(strip=True)
+        # Try both the machine-readable attribute and the human text.
+        for raw_value in (datetime_attr, text_value):
+            if not raw_value:
+                continue
+            timestamp = pd.to_datetime(raw_value, utc=True, errors="coerce")
+            if pd.isna(timestamp):
+                timestamp = pd.to_datetime(raw_value, errors="coerce")
+            if pd.isna(timestamp):
+                continue
+            if getattr(timestamp, "tzinfo", None):
+                timestamp = timestamp.tz_convert(None)
+            return timestamp.normalize()
+
+    # As a last resort assume the scrape date, which is less precise but keeps the row.
+    return fallback_date
+
+
+def scrape_current_headlines(url: str, keywords: List[str]) -> List[Dict[str, pd.Timestamp]]:
+    """Scrape Yahoo Finance for the latest Apple-related headlines."""
+    for attempt in range(1, SCRAPE_RETRIES + 1):
+        try:
+            response = requests.get(url, headers=REQUEST_HEADERS, timeout=10)
+            response.raise_for_status()
+        except requests.RequestException as exc:
+            print(f"Attempt {attempt}: error fetching headlines - {exc}")
+            if attempt < SCRAPE_RETRIES:
+                print("Retrying...")
+                time.sleep(RETRY_DELAY_SECONDS)
+                continue
+            return []
+
+        soup = BeautifulSoup(response.text, "html.parser")
+        headline_tags = []
+        # Evaluate CSS selectors until one yields results; this guards against layout churn.
+        for selector in HEADLINE_SELECTORS:
+            elements = soup.select(selector)
+            if elements:
+                headline_tags = elements
+                break
+
+        if not headline_tags:
+            print(
+                "Attempt {attempt}: no headline elements found. The page structure may have changed.".format(
+                    attempt=attempt
+                )
+            )
+            if attempt < SCRAPE_RETRIES:
+                time.sleep(RETRY_DELAY_SECONDS)
+                continue
+            return []
+
+        fallback_date = pd.Timestamp.utcnow().normalize()
+        unique_headlines = set()
+        filtered: List[Dict[str, pd.Timestamp]] = []
+
+        for tag in headline_tags:
+            headline_text = tag.get_text(strip=True)
+            if not headline_text:
+                continue
+            normalized_text = headline_text.lower()
+            if normalized_text in unique_headlines:
+                continue
+            if not any(keyword in normalized_text for keyword in keywords):
+                continue
+            unique_headlines.add(normalized_text)
+            headline_date = extract_headline_date(tag, fallback_date)
+            filtered.append({"headline": headline_text, "date": headline_date})
+
+        if filtered:
+            print(f"Found {len(filtered)} Apple-related headlines (attempt {attempt}).")
+            return filtered
+
+        print(
+            "Attempt {attempt}: no Apple-specific headlines found in scraped data.".format(
+                attempt=attempt
+            )
+        )
+        if attempt < SCRAPE_RETRIES:
+            print("Retrying scrape...")
+            time.sleep(RETRY_DELAY_SECONDS)
+
+    return []
+
+
+def load_historical_headlines(csv_path: Path) -> pd.DataFrame:
+    """Load and clean the historical headline dataset from CSV."""
+    if not csv_path.exists():
+        print(f"No historical headline file found at {csv_path}. Skipping.")
+        return pd.DataFrame()
+
+    df = pd.read_csv(csv_path)
+    expected_columns = {"date", "headline"}
+    if not expected_columns.issubset({col.lower() for col in df.columns}):
+        raise ValueError(
+            f"Historical headline file must contain columns: {expected_columns}. Found: {list(df.columns)}"
+        )
+
+    df.columns = [col.lower() for col in df.columns]
+    df = df.dropna(subset=["headline"]).copy()
+    df["headline"] = df["headline"].astype(str).str.strip()
+
+    df["date"] = pd.to_datetime(df["date"], errors="coerce", utc=True)
+    if df["date"].isna().any():
+        print("Warning: dropping rows with invalid dates from historical dataset.")
+        df = df.dropna(subset=["date"])
+
+    if df.empty:
+        print("Historical headline file is empty after cleaning. Skipping.")
+        return df
+
+    df["date"] = df["date"].dt.tz_convert(None).dt.normalize()
+    df = df.drop_duplicates(subset=["date", "headline"]).sort_values("date")
+    print(f"Loaded {len(df)} historical headlines from {csv_path}.")
+    return df
+
+
+# --- Sentiment scoring ---------------------------------------------------------------
+def load_finbert_model():
+    """Load the FinBERT tokenizer and sequence classification model."""
+    print("\nLoading FinBERT model for sentiment analysis...")
     tokenizer = AutoTokenizer.from_pretrained("yiyanghkust/finbert-tone")
     model = AutoModelForSequenceClassification.from_pretrained("yiyanghkust/finbert-tone")
+    model.eval()
     print("FinBERT model loaded successfully!")
-    
-    # Labels for output
-    labels = ["positive", "negative", "neutral"]
-    
-    # Function to predict the sentiment of the text
-    def predict_sentiment(text):
-        inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=512)
-        with torch.no_grad():
-            outputs = model(**inputs)
-        logits = outputs.logits
-        probabilities = torch.softmax(logits, dim=-1)
-        predicted_class = torch.argmax(logits, dim=1).item()
-        
-        return {
-            "sentiment": labels[predicted_class],
-            "positive": probabilities[0][0].item(),
-            "negative": probabilities[0][1].item(),
-            "neutral": probabilities[0][2].item()
-        }
-    
-    # Perform sentiment analysis on Apple headlines
-    if apple_headlines:
-        print(f"\nAnalyzing sentiment for {len(apple_headlines)} Apple headlines...")
-        results = []
-        
-        for i, headline in enumerate(apple_headlines, 1):
-            sentiment_scores = predict_sentiment(headline)
-            results.append({
-                "headline": headline,
+    return tokenizer, model
+
+
+def predict_sentiment(text: str, tokenizer, model) -> Dict[str, float]:
+    inputs = tokenizer(text, return_tensors="pt", truncation=True, padding=True, max_length=512)
+    with torch.no_grad():
+        outputs = model(**inputs)
+    logits = outputs.logits
+    probabilities = torch.softmax(logits, dim=-1)
+    predicted_class = torch.argmax(logits, dim=1).item()
+    return {
+        "sentiment": LABELS[predicted_class],
+        "positive": probabilities[0][0].item(),
+        "negative": probabilities[0][1].item(),
+        "neutral": probabilities[0][2].item(),
+    }
+
+
+def analyze_headlines(
+    headlines: Sequence[Dict[str, pd.Timestamp]],
+    tokenizer,
+    model,
+    source_label: str = "Apple headlines",
+) -> pd.DataFrame:
+    if not headlines:
+        print(f"No {source_label} available for sentiment analysis.")
+        return pd.DataFrame()
+
+    print(f"\nAnalyzing sentiment for {len(headlines)} {source_label}...")
+    records = []
+    for index, item in enumerate(headlines, start=1):
+        headline_text = item.get("headline", "").strip()
+        if not headline_text:
+            continue
+
+        headline_date = item.get("date")
+        headline_date = pd.to_datetime(headline_date, errors="coerce")
+        if pd.isna(headline_date):
+            headline_date = pd.Timestamp.utcnow().normalize()
+        if getattr(headline_date, "tzinfo", None):
+            headline_date = headline_date.tz_convert(None)
+        headline_date = headline_date.normalize()
+
+        sentiment_scores = predict_sentiment(headline_text, tokenizer, model)
+        records.append(
+            {
+                "date": headline_date,
+                "headline": headline_text,
                 "sentiment": sentiment_scores["sentiment"],
                 "positive": round(sentiment_scores["positive"], 4),
                 "negative": round(sentiment_scores["negative"], 4),
-                "neutral": round(sentiment_scores["neutral"], 4)
-            })
-            print(f"{i}. {headline}")
-            print(f"   Sentiment: {sentiment_scores['sentiment']} (Pos: {sentiment_scores['positive']:.2f}, Neg: {sentiment_scores['negative']:.2f}, Neu: {sentiment_scores['neutral']:.2f})")
-        
-        # Convert to DataFrame and display
-        sentiment_df = pd.DataFrame(results)
-        print(f"\nSentiment Analysis Summary:")
-        print(sentiment_df[['headline', 'sentiment', 'positive', 'negative', 'neutral']])
-        
-        # Save results to CSV
-        sentiment_df.to_csv("apple_sentiment_analysis.csv", index=False)
-        print(f"\nResults saved to 'apple_sentiment_analysis.csv'")
-    else:
-        print("\nNo Apple headlines found for sentiment analysis.")
+                "neutral": round(sentiment_scores["neutral"], 4),
+            }
+        )
+        print(
+            f"{index}. {headline_date.date()} - {headline_text}\n"
+            f"   Sentiment: {sentiment_scores['sentiment']} "
+            f"(Pos: {sentiment_scores['positive']:.2f}, "
+            f"Neg: {sentiment_scores['negative']:.2f}, "
+            f"Neu: {sentiment_scores['neutral']:.2f})"
+        )
 
-except Exception as e:
-    print(f"Error loading FinBERT model: {e}")
-    print("Make sure you have installed the required packages:")
-    print("pip install transformers torch")
+    return pd.DataFrame(records)
+
+
+# --- Feature engineering -------------------------------------------------------------
+def aggregate_daily_sentiment(sentiment_frames: Sequence[pd.DataFrame]) -> pd.DataFrame:
+    """Combine sentiment records and compute daily averages."""
+    frames = [df.copy() for df in sentiment_frames if df is not None and not df.empty]
+    if not frames:
+        print("No sentiment data available for daily aggregation.")
+        return pd.DataFrame()
+
+    combined = pd.concat(frames, ignore_index=True)
+    combined["date"] = pd.to_datetime(combined["date"], errors="coerce")
+    combined = combined.dropna(subset=["date"])
+    if combined.empty:
+        print("All sentiment rows have invalid dates after parsing.")
+        return combined
+
+    combined["date"] = combined["date"].dt.normalize()
+    summary = (
+        combined.groupby("date")
+        .agg(
+            avg_positive=("positive", "mean"),
+            avg_negative=("negative", "mean"),
+            avg_neutral=("neutral", "mean"),
+            headline_count=("headline", "count"),
+        )
+        .reset_index()
+        .sort_values("date")
+    )
+
+    # Round probabilities for easier inspection in downstream artifacts.
+    for column in ("avg_positive", "avg_negative", "avg_neutral"):
+        summary[column] = summary[column].round(4)
+
+    print("\nDaily sentiment aggregation complete. Preview:")
+    print(summary.head())
+    return summary
+
+
+def merge_sentiment_with_stock(daily_sentiment: pd.DataFrame, stock_data: pd.DataFrame) -> pd.DataFrame:
+    """Align daily sentiment with stock closes and create a movement label."""
+    if daily_sentiment is None or daily_sentiment.empty:
+        print("Daily sentiment frame is empty; skipping merge with stock data.")
+        return pd.DataFrame()
+    if stock_data is None or stock_data.empty:
+        print("Stock data frame is empty; skipping merge with sentiment aggregates.")
+        return pd.DataFrame()
+
+    stock = stock_data.copy()
+    stock.index = pd.to_datetime(stock.index)
+    stock = stock.sort_index()
+
+    close_col = "Close" if "Close" in stock.columns else "Adj Close" if "Adj Close" in stock.columns else None
+    if close_col is None:
+        raise ValueError("Stock dataset is missing both 'Close' and 'Adj Close' columns.")
+
+    stock_reset = stock.reset_index()
+    date_col = stock_reset.columns[0]
+    stock_reset[date_col] = pd.to_datetime(stock_reset[date_col], errors="coerce")
+    stock_reset = stock_reset.dropna(subset=[date_col])
+    stock_reset["date"] = stock_reset[date_col].dt.normalize()
+    stock_df = stock_reset[["date", close_col]].rename(columns={close_col: "close"})
+
+    merged = pd.merge(daily_sentiment, stock_df, on="date", how="inner")
+    if merged.empty:
+        print("Daily sentiment dates do not overlap with downloaded stock data.")
+        return merged
+
+    merged = merged.sort_values("date").reset_index(drop=True)
+    merged["next_close"] = merged["close"].shift(-1)
+    merged = merged.dropna(subset=["next_close"]).copy()
+    merged["stock_move"] = (merged["next_close"] > merged["close"]).astype(int)
+
+    print("\nMerged sentiment with stock data. Preview:")
+    print(merged.head())
+    return merged
+
+
+# --- Modeling ------------------------------------------------------------------------
+def train_baseline_model(
+    dataset: pd.DataFrame,
+    results_path: Path,
+    confusion_matrix_path: Path,
+) -> None:
+    """Train and evaluate a logistic regression baseline on the sentiment features."""
+    if dataset is None or dataset.empty:
+        print("Aggregated dataset is empty; skipping baseline model training.")
+        return
+
+    required_columns = {"avg_positive", "avg_negative", "avg_neutral", "stock_move"}
+    missing_columns = required_columns.difference(dataset.columns)
+    if missing_columns:
+        raise ValueError(f"Aggregated dataset is missing required columns: {missing_columns}")
+
+    label_counts = dataset["stock_move"].value_counts()
+    if label_counts.size < 2:
+        print("Baseline model training skipped: dataset contains only one class.")
+        return
+
+    features = dataset[["avg_positive", "avg_negative", "avg_neutral"]]
+    labels = dataset["stock_move"]
+
+    # A stratified split keeps both classes represented when we have enough samples.
+    stratify_labels = labels if label_counts.min() >= 2 else None
+    test_size = 0.3 if len(dataset) >= 10 else 0.4
+
+    X_train, X_test, y_train, y_test = train_test_split(
+        features,
+        labels,
+        test_size=test_size,
+        random_state=42,
+        stratify=stratify_labels,
+    )
+
+    if y_train.nunique() < 2:
+        print("Training set contains a single class after split; skipping baseline model.")
+        return
+
+    model = LogisticRegression(max_iter=1000)
+    model.fit(X_train, y_train)
+
+    y_pred = model.predict(X_test)
+
+    accuracy = accuracy_score(y_test, y_pred)
+    precision, recall, f1, _ = precision_recall_fscore_support(
+        y_test,
+        y_pred,
+        average="binary",
+        zero_division=0,
+    )
+    report = classification_report(
+        y_test,
+        y_pred,
+        target_names=["Down/Flat", "Up"],
+        zero_division=0,
+    )
+    cm = confusion_matrix(y_test, y_pred, labels=[0, 1])
+
+    results_lines = [
+        "# Baseline Logistic Regression Results",
+        "",
+        f"- Train samples: {len(X_train)}",
+        f"- Test samples: {len(X_test)}",
+        "- Feature columns: avg_positive, avg_negative, avg_neutral",
+        f"- Accuracy: {accuracy:.4f}",
+        f"- Precision (Up): {precision:.4f}",
+        f"- Recall (Up): {recall:.4f}",
+        f"- F1-score (Up): {f1:.4f}",
+        "",
+        "## Classification Report",
+        "```",
+        report.strip(),
+        "```",
+        "",
+        f"Confusion matrix saved to `{confusion_matrix_path.name}`.",
+    ]
+    results_path.write_text("\n".join(results_lines), encoding="utf-8")
+    print(f"Model metrics saved to '{results_path.name}'")
+
+    # Store the confusion matrix figure for the thesis appendices.
+    fig, ax = plt.subplots(figsize=(4.5, 4))
+    disp = ConfusionMatrixDisplay(
+        confusion_matrix=cm,
+        display_labels=["Down/Flat", "Up"],
+    )
+    disp.plot(ax=ax, cmap="Blues", colorbar=False, values_format="d")
+    ax.set_title("Logistic Regression Confusion Matrix")
+    plt.tight_layout()
+    fig.savefig(confusion_matrix_path, dpi=300)
+    plt.close(fig)
+    print(f"Confusion matrix saved to '{confusion_matrix_path.name}'")
+
+
+# --- Orchestration -------------------------------------------------------------------
+def main() -> None:
+    stock_data = fetch_stock_data(STOCK_SYMBOL, START_DATE, END_DATE)
+
+    headlines = scrape_current_headlines(QUOTE_URL, APPLE_KEYWORDS)
+    tokenizer, model = load_finbert_model()
+
+    live_sentiment_df = analyze_headlines(headlines, tokenizer, model)
+    if not live_sentiment_df.empty:
+        print("\nSentiment Analysis Summary (Live Headlines):")
+        print(live_sentiment_df[["date", "headline", "sentiment", "positive", "negative", "neutral"]])
+        live_sentiment_df.to_csv("apple_sentiment_analysis.csv", index=False)
+        print("\nResults saved to 'apple_sentiment_analysis.csv'")
+
+    historical_headlines_df = load_historical_headlines(HISTORICAL_HEADLINES_PATH)
+    historical_records = (
+        historical_headlines_df.to_dict("records") if not historical_headlines_df.empty else []
+    )
+    historical_sentiment_df = analyze_headlines(
+        historical_records,
+        tokenizer,
+        model,
+        source_label="historical Apple headlines",
+    )
+
+    if not historical_sentiment_df.empty:
+        print("\nSentiment Analysis Summary (Historical Headlines):")
+        print(
+            historical_sentiment_df[
+                ["date", "headline", "sentiment", "positive", "negative", "neutral"]
+            ].head()
+        )
+        historical_sentiment_df.to_csv(HISTORICAL_SENTIMENT_OUTPUT, index=False)
+        print(f"\nResults saved to '{HISTORICAL_SENTIMENT_OUTPUT.name}'")
+
+    daily_sentiment_df = aggregate_daily_sentiment([live_sentiment_df, historical_sentiment_df])
+    merged_dataset = merge_sentiment_with_stock(daily_sentiment_df, stock_data)
+    if not merged_dataset.empty:
+        columns_to_export = [
+            "date",
+            "avg_positive",
+            "avg_negative",
+            "avg_neutral",
+            "headline_count",
+            "close",
+            "next_close",
+            "stock_move",
+        ]
+        merged_dataset[columns_to_export].to_csv(AGGREGATED_DATA_OUTPUT, index=False)
+        print(f"\nAggregated dataset saved to '{AGGREGATED_DATA_OUTPUT.name}'")
+
+        train_baseline_model(merged_dataset, MODEL_RESULTS_PATH, CONFUSION_MATRIX_PATH)
+    else:
+        print("Aggregated dataset was not generated.")
+
+
+if __name__ == "__main__":
+    main()

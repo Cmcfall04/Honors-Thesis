@@ -1,0 +1,13 @@
+date,headline,sentiment,positive,negative,neutral
+2025-01-03,Apple expands manufacturing partnership with Foxconn in India,positive,0.8387,0.1612,0.0
+2025-01-17,Wall Street sees upside as Apple doubles down on MacBook AI chips,negative,0.0,1.0,0.0
+2025-02-04,Apple sets March event to unveil upgraded iPad Pro with OLED display,positive,1.0,0.0,0.0
+2025-02-19,Regulators probe App Store rules amid European developers' complaints,neutral,0.4752,0.0003,0.5245
+2025-03-12,Apple launches green bond to fund clean energy suppliers,positive,0.9993,0.0007,0.0
+2025-04-01,Analysts debate demand after Apple trims Vision Pro production targets,neutral,0.0133,0.0,0.9867
+2025-04-18,Apple retail chief outlines strategy for emerging market growth,positive,0.9999,0.0001,0.0
+2025-05-09,Supply chain reports strong iPhone 16 preorder momentum,negative,0.0,1.0,0.0
+2025-06-03,WWDC preview: Apple rumored to announce new on-device AI features,positive,0.9999,0.0001,0.0
+2025-07-22,Apple signs multi-year deal to stream MLS matches globally,positive,0.9881,0.0119,0.0
+2025-08-14,Services segment offsets softer hardware sales in Apple earnings,neutral,0.0005,0.0877,0.9118
+2025-09-05,Apple partners with TSMC on next-gen 2nm process capacity,positive,1.0,0.0,0.0

@@ -1,7 +1,5 @@
-headline,sentiment,positive,negative,neutral
-Intel Corp. (INTC) Jumps 20% as Firm Courts Apple Inc.,negative,0.0268,0.9732,0.0
-Jim Cramer Does’t Think Reports Of Intel (INTC) Asking Apple For Investment Are Serious,positive,0.995,0.0,0.005
-Apple Momentum Slows as Jefferies Reiterates Hold at $206,neutral,0.0,0.0,1.0
-Apple Just Unveiled the iPhone 17: Here’s What This Means for You If You Own Stock,positive,1.0,0.0,0.0
-Apple Stock Is on a Roll. But This Data Show iPhone 17 Sales Losing Momentum.,neutral,0.0,0.0,1.0
-Can Apple Stock Hit $310 in 2025?,positive,0.9402,0.0208,0.039
+date,headline,sentiment,positive,negative,neutral
+2025-10-02,Apple shelves Vision Pro revamp in pursuit of AI glasses to rival Meta - Bloomberg,positive,0.9969,0.0002,0.003
+2025-10-02,"Apple pulled off a quiet rebound, but here’s the lever many missed",neutral,0.0004,0.0007,0.9988
+2025-10-02,"Apple halts Vision Pro overhaul to focus on AI glasses, Bloomberg News reports",positive,0.9909,0.0,0.0091
+2025-10-02,"iPhone 17 Outsells On Speed, Not AI Hype: Analyst",positive,0.9998,0.0,0.0002
