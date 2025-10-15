@@ -1,0 +1,361 @@
+date,headline,sentiment,positive,negative,neutral
+2024-01-02,CEO Bet His Firm On a Fight With Apple,positive,0.9964,0.0007,0.0029
+2024-01-05,"Technology Stocks Extend Their Stumble --- Nasdaq notches fifth straight day of losses, pressured by Amazon, Apple",neutral,0.0001,0.0012,0.9987
+2024-01-06,"Out of Cloud Storage? These Are Your Options So You Don't Overpay; Even if you've run out of space on Apple iCloud or Google One, you don't always have to buy more",positive,0.9999,0.0,0.0001
+2024-01-08,Apple's Vision Pro to Become Available in U.S. Feb. 2,positive,0.9995,0.0005,0.0001
+2024-01-09,"Accenture Acquires Marketing and Tech Agency Work & Co. Carlyle Group in 2020 acquired a minority stake in the agency, whose clients have included Apple and Google",positive,0.9998,0.0,0.0001
+2024-01-09,Apple Sets Date For Vision Pro's Launch in U.S.,positive,1.0,0.0,0.0
+2024-01-09,Sonos Names Apple Executive Saori Casey as Next Finance Chief; Casey most recently served as vice president of finance at Apple,positive,1.0,0.0,0.0
+2024-01-11,Microsoft Dethroned Apple as the Largest U.S. CompanyFor a Minute; The software giant's stock has been on the rise thanks to the continued growth of its cloud computing division; Apple reclaimed the top spot,negative,0.0,1.0,0.0
+2024-01-11,"Apple Directors Al Gore, James Bell to Retire; The former U.S. vice president had been a board member since 2003",positive,0.9999,0.0,0.0001
+2024-01-12,Business News: Gore Retires from Board of iPhone Maker,positive,0.9999,0.0,0.0001
+2024-01-12,Business News: Microsoft's Market Cap Briefly Tops Apple's,positive,0.9733,0.0265,0.0002
+2024-01-15,Apple to Remove Blood-Oxygen Sensor From Watch to Avoid U.S. Ban; Tech giant's withdrawal of technology may end cloud hanging over $18 billion smartwatch business,neutral,0.0003,0.0,0.9997
+2024-01-16,Apple to Drop Watch Health Tool Over Patent Dispute,neutral,0.0296,0.0105,0.9599
+2024-01-16,"Apple Goes on the Offensive as iPhone Sales Slip in Its Biggest Overseas Market; Rare discounts in China seek to counter high-end products from Samsung, Huawei",neutral,0.0,0.0003,0.9996
+2024-01-16,"Supreme Court Denies Petitions on Apple, Epic Appeals; The decision might create new options for companies such as Netflix and Spotify to sign up customers.",positive,0.9999,0.0,0.0
+2024-01-17,Apple Alters App Policies After Court's Rebuff,positive,0.9999,0.0,0.0
+2024-01-17,Apple Loses Attempt to Delay U.S. Watch Ban; Tech giant will have to disable the pulse-oximeter feature on its timepiece to continue U.S. sales,neutral,0.0,0.0,1.0
+2024-01-17,Apple Changes Its App Store Policy. Critics Call the Moves 'Outrageous.'; iPhone maker will allow developers to process purchases outside of its app store but will still charge a commission,positive,0.9991,0.0005,0.0004
+2024-01-17,"Apple Lowers Its iPhone Prices in China --- Discounts seek to counter high-end products from Samsung, Huawei",neutral,0.0699,0.3772,0.5529
+2024-01-17,"Supreme Court Denies Petitions on Apple, Epic Appeals; Apple unveiled new App Store policies after the decision that immediately drew ire from software makers",positive,1.0,0.0,0.0
+2024-01-17,"Can a Samsung AI Phone Beat an iPhone? The new artificial-intelligence features, including Circle to Search, up the ante in its battle with Apple",negative,0.0016,0.9983,0.0
+2024-01-18,App Developers Blast New Apple Fee Rule --- Company imposes 27% charge on those using alternative payment methods,positive,0.9999,0.0,0.0001
+2024-01-18,Apple Loses Attempt to Delay U.S. Watch Ban; Tech giant will have to disable the pulse-oximeter feature on its timepiece to continue U.S. sales,neutral,0.0,0.0,1.0
+2024-01-18,Apple Loses Bid to Stall Watch Ban Amid Fight Over Patent,neutral,0.0,0.0002,0.9998
+2024-01-19,Apple Offers to Open Mobile Payments to Third Parties Amid EU Antitrust Case; Proposal follows scrutiny about blocking access to the tech behind Apple Pay,neutral,0.3063,0.0003,0.6934
+2024-01-20,EXCHANGE --- Apple Set To Allow Third-Party Payments,positive,1.0,0.0,0.0
+2024-01-22,Turn On This New iPhone Setting to Protect Your Money and Photos; Apple's Stolen Device Protection in iOS 17.3 can protect your iPhone if it gets stolen along with your passcode,neutral,0.2876,0.2149,0.4974
+2024-01-24,"Apple Plans New Fees and Restrictions for Downloads Outside App Store; Meta, Spotify and other companies are weighing new options for customers as Apple makes changes to comply with new European law",positive,0.999,0.0009,0.0001
+2024-01-25,"Apple's Smartphone Shipments in China Fell in Fourth Quarter; For the full year, the U.S. tech giant overtook local rival Vivo to become China's top smartphone vendor for the first time",neutral,0.0,0.0,1.0
+2024-01-25,"Apple Issues Changes to Operating System, App Store to Comply With EU Law; Changes to be available to consumers in the 27 EU countries in March",positive,1.0,0.0,0.0
+2024-01-25,"Apple Plans New Fees, Limits for Downloads Outside Its App Store",positive,1.0,0.0,0.0
+2024-01-26,Apple's Smartphone Shipments In China Fall,neutral,0.1062,0.0001,0.8937
+2024-01-27,"Apple, Boeing, GM Usher in Latest Week of Packed Earnings; Starbucks, Exxon Mobil and Pfizer, among other blue-chip names, report results in coming days",positive,1.0,0.0,0.0
+2024-01-27,"The Main Driver of Apple's Success Has Become Its Biggest Liability; The tech giant's 'walled garden' has driven record revenues, but the way the company is trying to preserve it has become an invitation for regulators to pounce, partners to defect and competitors to circle",negative,0.0,1.0,0.0
+2024-01-28,Meta Welcomes Headset War With Apple; Company executives are optimistic about competition as billions spent have yet to translate into wide consumer adoption,negative,0.0,1.0,0.0
+2024-01-29,"Can Apple's $3,499 Vision Pro Headset Win Over Wary Consumers? Company's first new product in nearly a decade has received pushback from some app developers",neutral,0.0001,0.2172,0.7827
+2024-01-29,"Business News: Apple, GM Top Week's Earnings --- Results to provide clues into whether consumers will continue to spend",positive,0.9992,0.0,0.0008
+2024-01-29,Meta Eager To Battle Apple in Headsets,positive,0.9016,0.0563,0.0421
+2024-01-30,Apple Vision Pro Has an App Issue --- Tech giant's first new product in years gets pushback from developers,neutral,0.0,0.0,1.0
+2024-01-30,"Apple Vision Pro Review: The Best Headset Yet Is Just a Glimpse of the Future; Working, cooking, skiing, kicking backour columnist wore Apple's new mixed-reality headset for a week to see what it's for",positive,0.7654,0.2339,0.0007
+2024-01-30,"Can Apple's $3,499 Vision Pro Headset Win Over Wary Consumers? Company's first new product in nearly a decade receives pushback from some app developers",neutral,0.0,0.0065,0.9935
+2024-02-01,"Apple Sales Rise in Holiday Quarter, Ending Streak of Declines; Services revenue climb even as China sales continue to be a concern for investors",neutral,0.0,0.0001,0.9999
+2024-02-02,"The People Buying Apple's $3,500 Vision Pro Headset; Die-hard fans gather at Apple's Fifth Avenue store; 'I want to be a part of history'",positive,1.0,0.0,0.0
+2024-02-02,"Amazon and MetaNothing Artificial About These Results; Strong earnings growth and a surprise dividend draw cheers as Apple reveals China struggles, but AI hopes are high",negative,0.0,1.0,0.0
+2024-02-02,"Apple Returns To Growth Path, Ends Tailspin",negative,0.0,1.0,0.0
+2024-02-02,"Apple Sales Rise in Holiday Quarter, Ending Streak of Declines; Services revenue climb even as China sales continue to be a concern for investors",neutral,0.0,0.0001,0.9999
+2024-02-03,"EXCHANGE --- Apple's $3,500 Vision Pro Headset Hits Stores",positive,1.0,0.0,0.0
+2024-02-04,"Burritos and Big Macs to Cost More in California as Pay Rises; Minimum wage for fast-food workers jumps to $20 an hour in April, chains plan to increase prices",negative,0.47,0.5264,0.0035
+2024-02-04,"Big Brands Are Playing the Long Game in China; Apple, Mondelez and Procter & Gamble are bullish on consumer spending growth in China despite recent economic turmoil there",negative,0.0,1.0,0.0
+2024-02-07,Apple Leads the Management Top 250 All-Stars; Seven companies scored high across the board in the latest ranking of management effectiveness,negative,0.0,1.0,0.0
+2024-02-10,Apple's New Face Computer Is for Work; Forget 'spatial computing.' The killer apps for Apple's new Vision Pro will be the same ones we already use every day.,positive,0.9992,0.0007,0.0001
+2024-02-11,"Hands Off! With $3,500 Headsets in the Wild, New Social Norms Apply; Apple Vision Pro early adopters are walking magnets for curious stares and interruptions",positive,0.9999,0.0001,0.0
+2024-02-13,"The Tiger Cub Economy Hustling for Its Big Break Without Apple, Tesla; Indonesia needs to get rich before it gets old. Time is running out.",positive,0.998,0.0001,0.0019
+2024-02-14,Warren Buffett's Berkshire Hathaway Trims Its Massive Stake in Apple; The investment has grown to an outsize share of the stock portfolio,positive,0.9972,0.0027,0.0001
+2024-02-14,Ex-Apple Executive Eyed for Sports Venture,positive,0.9999,0.0,0.0
+2024-02-14,"Former Apple Executive Among CEO Candidates for New Sports-Streaming Venture; Planned venture from Disney, Warner and Fox would combine their live-sports channels into a streaming package",positive,1.0,0.0,0.0
+2024-02-15,Berkshire Hathaway Trims Its Apple Stake,positive,0.9999,0.0,0.0001
+2024-02-15,Meta Encourages Advertisers to Ditch iPhone in Latest Spat With Apple; Advertisers are steered to a workaround to avoid paying 30% service charge to Apple for boosted posts,positive,0.9993,0.0005,0.0002
+2024-02-16,Meta Pushes Workaround For Apple Fee --- Plan would help advertisers avoid a 30% service charge for 'boosted posts',negative,0.0452,0.9547,0.0001
+2024-02-18,"Why New York City Can't Fix Its Ugly Scaffolding Problem; Thanks to archaic laws, the Big Apple is filled with sidewalk sheds that stay for years",positive,0.8676,0.0004,0.1319
+2024-02-23,"Nvidia Hits $2 Trillion Valuation on Insatiable AI Chip Demand; Chip maker has become one of the most valuable U.S. companies, trailing only Microsoft and Apple",negative,0.078,0.9202,0.0018
+2024-02-24,"Red-Hot Nvidia's Valuation Touches $2 Trillion --- AI frenzy drives chip stock briefly past mark; only Microsoft, Apple valued higher",positive,0.6443,0.354,0.0017
+2024-02-27,Apple Ends Quest to Build Its Own Electric Vehicle; The company plans to shift some car-project employees to artificial-intelligence work,positive,1.0,0.0,0.0
+2024-02-28,Apple Shareholders Reject AI Report Proposal; Proposal would have required the tech giant to disclose its use of artificial intelligence in operations,positive,0.9999,0.0,0.0001
+2024-02-28,Detroit Warned Apple About Making a Car. It Had to Learn the Hard Way. Tech giant's interest in developing a car helped highlight an investment boom in Silicon Valley,negative,0.0003,0.9997,0.0
+2024-02-28,Tech Stocks Lead U.S. Indexes Lower; Shares fall for Apple and Alphabet. Investors wait for a key inflation gauge.,positive,0.9745,0.0047,0.0209
+2024-02-28,Apple Abandons Its Electric-Car Project,neutral,0.0006,0.0,0.9994
+2024-02-28,"One Month With Apple Vision Pro: In the Air, on a Train andin a Drawer; Four weeks in, the best thing about the Vision Pro isn't any new apps, just an escape from the worldand your iPhone",positive,0.9189,0.0808,0.0003
+2024-02-29,"How 'Palm Royale' Nailed the Splashy Interiors of 1969's High Society; The new show from Apple TV+ pits deliciously bitchy Palm Beach socialites against scrappy country-club crashers, played out on '60s-era sets from old-money mansions to scrappy midcentury salons",positive,1.0,0.0,0.0
+2024-02-29,Apple Gets Hard Lesson in Making Cars,negative,0.0013,0.9889,0.0098
+2024-02-29,"Technology Sector Leads Stocks Lower --- Apple, Alphabet lose ground; investors await Fed's preferred inflation gauge",neutral,0.0016,0.031,0.9674
+2024-02-29,Apple Is Behind in AIand Investors Are Getting Impatient; iPhone-maker is expected to unveil AI tools at June developer conference after lagging behind tech peers with clearer AI strategies,neutral,0.0445,0.1854,0.7701
+2024-03-01,Apple's Slowness In AI Tests Investors' Patience,neutral,0.0,0.0003,0.9997
+2024-03-02,"OFF DUTY --- Design & Decorating -- Binge-Worthy Decor: Tune In, Turn On, 1969 Style --- Get a retro-design fix with Apple TV+'s 'Palm Royale'",positive,1.0,0.0,0.0
+2024-03-03,"Apple Is Playing an Expensive Game of AI Catch-Up; Killing ambitious car project will free up some R&D budget, but Apple still lags behind big tech peers on network scale and relative investment",neutral,0.0015,0.0334,0.965
+2024-03-04,Apple Fined $2 Billion in One of Europe's Largest Antitrust Actions; EU fine related to music-streaming apps comes after yearslong probe into the iPhone maker's app-store practices,neutral,0.3502,0.0037,0.6461
+2024-03-05,The Secret iPhone Setting Every Owner Should Know; A new way to launch apps and certain iOS features is hidden right behind your screen.,positive,0.9783,0.0215,0.0002
+2024-03-05,"It Took Nine Minutes of 'Goodfellas' to Turn Jake Lacy Into an Actor; The 'Apples Never Fall' star on the movie that put performing on his radar, his wild side and how 'White Lotus' moved him out of the 'nice boyfriend' role",positive,1.0,0.0,0.0
+2024-03-05,EU Knocks Apple With $2 Billion Fine,neutral,0.1562,0.0016,0.8422
+2024-03-05,"Apple's iPhone Sales in China Fall as Huawei Gains Market Share; Sales by Chinese rival Huawei rose, driven higher by demand for its Mate 60 series",negative,0.0,1.0,0.0
+2024-03-06,Apple's iPhone Sales Decline in China,neutral,0.0,0.0,1.0
+2024-03-06,Epic Games Says Apple Terminated Its Developer Account; Fortnite developer says it is prevented from bringing its game store to iOS devices,neutral,0.0233,0.0,0.9767
+2024-03-07,"How Apple Stands to Lose From Europe's New Tech Law; Under the new rules, the iPhone maker will open up parts of its lucrative app ecosystem, providing an opportunity for rivals like Google",negative,0.0,1.0,0.0
+2024-03-07,Epic Says Apple Canceled Account,positive,0.9905,0.0,0.0094
+2024-03-08,Apple Confronts Headwinds From EU's Tech Law,neutral,0.0,0.0,1.0
+2024-03-08,"Apple Reverses Ban on Fortnite-Maker in EU, a Sign of Softening Approach to Crackdown; Tech giant earlier blocked the efforts of Epic Games to build out its own app store",neutral,0.0,0.0,1.0
+2024-03-09,EXCHANGE --- Apple Reverses Ban on Epic in EU --- Tech giant had blocked Fortnite maker's efforts to build own app store,neutral,0.3859,0.0001,0.6141
+2024-03-09,"OFF DUTY --- Gear & Gadgets: A Tale of Two (or Three) Taps --- Your iPhone hides a ton of functionality in its endless Settings menu. Here, a shortcut to launch your favorite feature or app...almost instantly.",positive,0.9936,0.0001,0.0064
+2024-03-11,Apple to Open New Store in Shanghai Amid Falling iPhone Sales; Shanghai already has the highest number of Apple stores in mainland China,negative,0.0007,0.999,0.0002
+2024-03-12,Apple Makes Further Concessions to App Developers in Europe; Company will allow users to download an app directly from a developer's website,positive,0.9998,0.0001,0.0002
+2024-03-12,Apple Plans to Open a New Store in Shanghai,positive,1.0,0.0,0.0
+2024-03-13,Apple Makes More Concessions After EU Rule,positive,0.9888,0.0042,0.007
+2024-03-13,"French Fashion, German Rule --- 'The New Look' on Apple TV+ depicts Dior and Chanel's lives in Nazi-occupied Paris",positive,1.0,0.0,0.0
+2024-03-14,Fireworks and Confetti: Apple Video Feature Wreaks Havoc at Meetings; Mac camera effect sparks embarrassment: Users accidentally set off on-screen balloons and other flourishes in serious settings. 'Freaking awkward.',neutral,0.006,0.0083,0.9857
+2024-03-15,Apple to Pay $490 Million to Settle Lawsuit Over Tim Cook's China Comments; Plaintiffs said Apple misled investors in 2018 by hiding weak China demand; company denied wrongdoing,neutral,0.0,0.0,1.0
+2024-03-15,"Former Apple Executive to Lead Sports-Streaming Venture From ESPN, Warner and Fox; As CEO, Pete Distad will oversee a company that would pool live-sports programming from the media companies",positive,1.0,0.0,0.0
+2024-03-15,"This Strawberry Will Blow Your Mind: Inside the Startlingly Delicious World of Designer Produce; Supermarket shoppers are saying no to bland fruit and veg bred more for shelf life than pleasure. From Cosmic Crisp apples to Sweet Garleeks, designer varieties may cost a bit more, but ohthe flavor!",positive,0.9976,0.0013,0.0011
+2024-03-16,"OFF DUTY --- Eating & Drinking: In Very Good Taste --- Supermarket shoppers are saying no to bland fruit and veg bred more for shelf life than pleasure. From Cosmic Crisp apples to Sweet Garleeks, designer varieties may cost a bit more, but oh...the flavor!",negative,0.0466,0.9531,0.0003
+2024-03-16,EXCHANGE --- Ex-Apple Executive To Lead Streaming Venture,positive,0.9998,0.0001,0.0001
+2024-03-16,EXCHANGE --- iPhone Maker to Pay $490 Million in Suit Over CEO's Comments,positive,0.9999,0.0,0.0001
+2024-03-19,Apple Looks to External Partners to Boost AI Efforts; The iPhone giant is playing catch-up in generative AI boom with the help of Google or OpenAI,negative,0.0021,0.9979,0.0
+2024-03-20,Apple Looks for Partners to Boost Its AI Efforts,negative,0.0,1.0,0.0
+2024-03-20,"Top Companies for Innovation; Amazon.com heads this list from the Management Top 250, followed by Apple, Microsoft and Walmart",positive,1.0,0.0,0.0
+2024-03-20,"Apple Faces Legal Protest From Meta, Microsoft, X and Match; Four tech companies object to Apple's new app store policies related to payment for services",neutral,0.0534,0.0002,0.9464
+2024-03-21,"U.S. Sues Apple, Alleges Tech Giant Exploits Illegal Monopoly; Justice Department says company makes it difficult for competitors to integrate with iPhone",neutral,0.0001,0.0,0.9999
+2024-03-21,New Apple App Store Policies Face Legal Pushback,neutral,0.0,0.0003,0.9997
+2024-03-21,"Apple Faces Legal Protest From Meta, Microsoft, X, Spotify and Match; Five tech companies object to Apple's new app store policies related to payment for services",neutral,0.083,0.0002,0.9168
+2024-03-22,"The Score: Reddit, Apple, FedEx and More Stocks That Defined the Week; Here are some of the major companies whose stocks moved on the week's news",positive,1.0,0.0,0.0
+2024-03-22,Apple Turned On a Buried iPhone Setting. You Might Want It Off. The 'Discoverable by Others' switch is on by default. Here's what it doesand why it isn't as scary as it sounds.,positive,0.5924,0.0209,0.3868
+2024-03-22,Apple's Business Model Getting Hit From All Sides Now; U.S. is just the latest government to challenge closed ecosystem that has helped make Apple the world's most profitable smartphone maker,negative,0.0,1.0,0.0
+2024-03-22,U.S. Accuses Apple of iPhone Monopoly --- Lawsuit alleges tech giant used its sway to limit competing devices' functionality,neutral,0.2372,0.01,0.7529
+2024-03-22,Monopoly Case Pits Justice Department Against Apple's Antitrust Winning Streak; The iPhone maker has fended off numerous legal challenges with a defense that its closed ecosystem is safer and better for users,negative,0.0,0.9834,0.0166
+2024-03-22,Apple Held Talks With China's Baidu Over AI for Its Devices; iPhone maker may need a partner in the country to navigate regulatory hurdles,positive,0.9678,0.0,0.0322
+2024-03-23,Ghost of Microsoft Stalks Apple as DOJ Takes Its Shot; Bill Gates has said his legal battle distracted him from the rise of mobile,neutral,0.0,0.0,1.0
+2024-03-23,EXCHANGE --- Apple Held Talks With Baidu Over AI for Its Devices,positive,1.0,0.0,0.0
+2024-03-23,"EXCHANGE --- The Score / The Business Week in 5 Stocks: Reddit IPO Takes Off, Apple Slumps",neutral,0.0032,0.0001,0.9966
+2024-03-23,EXCHANGE --- Monopoly Case Will Challenge iPhone Maker's Winning Streak,neutral,0.0,0.0,1.0
+2024-03-24,NYCB and Meridian Rode the Property Boom Together. Now They're Struggling. The bank got many of its loans from a broker now blacklisted by Fannie Mae and Freddie Mac,neutral,0.0001,0.0,0.9999
+2024-03-25,"China Rolls Out Welcome Mat for U.S. CEOs as It Nods to Its Economic Problems; Premier Li Qiang acknowledges foreign executives' concerns as Beijing staged annual business forum attended by Apple, Qualcomm, Micron CEOs",positive,0.4078,0.3997,0.1925
+2024-03-25,"Apple, Meta, Google Probed by EU Under New Digital-Competition Law; Investigations add to regulatory headaches for U.S. tech companies under growing scrutiny worldwide",neutral,0.0,0.0,1.0
+2024-03-25,Baidu Shares Rise After Reports That Apple Will Use Its AI Services in China Products; Chinese regulators have to approve generative AI models before they can be launched to the public,positive,0.9475,0.0002,0.0524
+2024-03-25,The Ghost of Microsoft Stalks Apple,positive,1.0,0.0,0.0
+2024-03-26,"Apple, Meta and Alphabet Face EU Scrutiny",neutral,0.0003,0.0,0.9996
+2024-03-26,'Its Suggestions Were Slightly Jarring': Two Weeks with the iPhone's New Journaling App; The new app is one of Apple's new digital well-being aids. Can it help you become a calmer person?,positive,0.5297,0.4701,0.0002
+2024-03-27,"Can Apple and AI Make Baidu Cool Again? China's search leader was long viewed as an also-ran, but shifting political and technological winds might change that",neutral,0.0173,0.0008,0.9819
+2024-03-27,Apple Turns to Longtime Steve Jobs Disciple to Defend Its 'Walled Garden'; Former Chief Marketing Officer Phil Schiller has frequently made it clear that Apple doesn't intend to yield to developer criticism,neutral,0.009,0.0,0.991
+2024-03-28,Disciple of Jobs Leads Apple's Public Defense,positive,0.9976,0.0003,0.002
+2024-03-30,"OFF DUTY --- Gear & Gadgets: Dear iPhone, Today I... --- Two weeks with the new journaling app, one of Apple's latest digital well-being aids",positive,0.9998,0.0002,0.0
+2024-04-01,"The Stock Market's Magnificent Seven Is Now the Fab Four; It is a bullish signal that the market is rallying without the likes of Apple and Tesla, some investors say",negative,0.0,1.0,0.0
+2024-04-02,Jon Stewart Says Apple Urged Him Not to Interview Lina Khan; FTC chair has been a strong critic of tech companies,negative,0.0151,0.9847,0.0002
+2024-04-03,The Underrated iPhone App That Makes Everyday Tasks Easier; Don't relegate the Apple Shortcuts app to the same hidden folder as Compass and Keynoteit might be the most useful app you have,positive,0.9825,0.0159,0.0016
+2024-04-03,Stewart Says Apple Urged Him Not to Host FTC Chair,positive,0.9999,0.0,0.0001
+2024-04-04,"Apple Isn't Making an EV, but Chinese Phone Makers Are Showing They Can; Xiaomi has launched a hit new high-end electric vehicle in Chinafor much less than a Model 3",positive,0.9989,0.0002,0.0009
+2024-04-05,Apple Lays Off 614 Workers After Canceling Car Project; The layoffs come a little more than a month after reports that Apple had axed its decadelong plan to build a self-driving electric car,positive,0.9925,0.0002,0.0074
+2024-04-06,EXCHANGE --- Apple Lays Off 614 Workers After Canceling Car Project,positive,1.0,0.0,0.0
+2024-04-06,"OFF DUTY --- Gear & Gadgets: Your Phone Has a Secret --- Apple's Shortcuts app can unlock a range of custom functions and automations that will save you time, money and stress",negative,0.0001,0.9999,0.0
+2024-04-07,"Big Tech Has a Big Cash Problem; Any acquisitions companies such as Apple, Amazon or Microsoft attempt will bring scrutiny and delays",neutral,0.0,0.0,1.0
+2024-04-15,"New York Tops Destinations for Relocating Tech Workers; The Big Apple attracted the greatest share of tech workers who were on the move last year, a report by venture firm SignalFire finds",positive,0.982,0.0179,0.0001
+2024-04-15,Apple's Smartphone Sales Slump as China Rivals Rise; Samsung Electronics reclaimed its status as the number one seller of smartphones worldwide,neutral,0.0,0.0,1.0
+2024-04-16,Apple's Smartphone Sales Slump,neutral,0.0,0.0,1.0
+2024-04-17,Apple Weighs Manufacturing in Indonesia Amid Diversification Drive; Apple doesn't currently have a manufacturing base in Southeast Asia's largest economy,neutral,0.4984,0.0,0.5016
+2024-04-17,"Top Companies for Financial Strength; Apple heads this list from the Management Top 250, followed by Microsoft and Alphabet",positive,0.9985,0.0015,0.0
+2024-04-18,Business News: Apple Considers Indonesia In Push to Diversify Supply --- Tech giant doesn't have manufacturing base in Southeast Asian country,positive,1.0,0.0,0.0
+2024-04-18,"Apple Pitches Its $3,500 Vision Pro Headset to Businesses. Will It Catch On? Retailer Lowe's and software developer SAP are among the companies the tech giant is touting as proof of the device's usefulness to businesses",positive,0.99,0.01,0.0
+2024-04-18,Apple to Spend More Than $250 Million to Expand Singapore Hub; Apple seeks to diversify its supply chain amid rising U.S.-China tensions and global concerns of decoupling trade,positive,0.9706,0.0293,0.0001
+2024-04-19,"China Orders Apple to Remove Popular Messaging Apps; WhatsApp, Signal and Telegram among apps cut from iPhone app store to comply with censorship demand",positive,0.8653,0.0006,0.1341
+2024-04-19,China Orders Apple To Remove Meta Apps,positive,0.9696,0.0004,0.03
+2024-04-19,Apple to Spend $250 Million On Singapore Hub,positive,1.0,0.0,0.0
+2024-04-20,"EXCHANGE --- The Score / The Business Week in 6 Stocks: UnitedHealth Bounces Back, Apple Loses Out",neutral,0.0009,0.0875,0.9116
+2024-04-21,Looking for Prestige History Dramas? Try Apple TV+; Series such as 'Franklin' and 'Manhunt' have turned AppleTV+ into a home for a certain style of period stories,positive,1.0,0.0,0.0
+2024-04-23,Apple iPhone Sales Slump in China Amid Huawei's Comeback; Huawei's sales were helped by the successful launch of its 5G-capable Mate 60 series,negative,0.0,0.9994,0.0006
+2024-04-24,iPhone's China Sales Sink Amid Competition,neutral,0.0,0.0,1.0
+2024-04-26,Microsoft CEO to Visit Southeast Asia With AI on Agenda; Satya Nadella's trip to Southeast Asia will come on the heels of a visit by Apple Chief Executive Tim Cook,positive,1.0,0.0,0.0
+2024-04-26,"Why an iPhone Can Survive a Drop From a Plane, but Not From Your Kitchen Counter; We launched a drone with Apple and Samsung phones 300 feet in the air to test their durability",positive,0.9562,0.0397,0.0041
+2024-04-29,"Apple Might Be Able to Phone It In Now; Slumping stock price has tempered Apple's valuation, making another weak iPhone report less risky",neutral,0.0,0.0006,0.9994
+2024-05-02,"Apple Sales Fall as iPhone, China Businesses Remain Sluggish; The iPhone maker authorized $110 billion in share buybacks and forecast a return to revenue growth in the current quarter",negative,0.0001,0.9544,0.0455
+2024-05-02,Nasdaq Closes Higher as More Earnings Roll In; Apple reports its quarterly results after the market close,positive,1.0,0.0,0.0
+2024-05-03,AI Could Breathe Life Back into Apple's iPhone Sales; Analysts are increasingly optimistic about Apple's nascent AI offerings,negative,0.0,1.0,0.0
+2024-05-03,"Apple Sales Fall as iPhone, China Businesses Remain Sluggish; The iPhone maker authorized $110 billion in share buybacks and forecast a return to revenue growth in the current quarter",negative,0.0001,0.9544,0.0455
+2024-05-03,"The iPhone Is Losing Its Cutting-Edge Appeal in China; Apple trails in introducing AI applications, but it says innovations are coming soon",neutral,0.0,0.0,1.0
+2024-05-03,"Apple's Sales Fall On Slow Demand in Key Areas --- Share buybacks of $110 billion unveiled, a return to revenue growth is forecast",neutral,0.0,0.0,1.0
+2024-05-03,"Apple Is Buffett's Best Investment. It's Also Now One of His Riskiest. The legendary investor and his longtime partner, Charlie Munger, changed their stripes for a tech stock. Now, the size of the stake worries some Berkshire shareholders.",neutral,0.0008,0.0,0.9992
+2024-05-03,"Apple Buys Itself Some Time for an AI Boost; Raised share buybacks help buttress weak iPhone sales, but Apple will need to make its own AI play clear soon",neutral,0.0019,0.1037,0.8944
+2024-05-04,iPhone Loses Ground To Rivals In China,neutral,0.0,0.0,1.0
+2024-05-04,Warren Buffett Praises Apple After Berkshire Hathaway Cuts Stake; The storied investor also pays tribute to his late business partner Charlie Munger,positive,0.9998,0.0,0.0001
+2024-05-06,Buffett Praises Apple After Stake Cut --- Investor also pays tribute to late business partner at annual meeting,positive,0.9998,0.0001,0.0001
+2024-05-06,"Apple Is Developing AI Chips for Data Centers, Seeking Edge in Arms Race; The company is leaning on its long history of chip development in the effort, code-named Project ACDC",positive,0.9965,0.0034,0.0
+2024-05-07,Apple's New iPad Pro vs. New iPad Air vs. iPad: Why Are There So Many? A thinner Pro! A bigger Air! A cheaper basic iPad! And don't forget Mini! A guide to Apple's overwhelming tablet offerings,positive,0.9899,0.0096,0.0005
+2024-05-07,"Apple Is Developing AI Chips for Data Centers, Seeking Edge in Arms Race; The company is leaning on its long history of chip development in the effort, code-named Project ACDC",positive,0.9965,0.0034,0.0
+2024-05-07,Apple Pursues Own AI Chip Design --- Company leans on its consumer-tech talent as it enters arms race over data servers,positive,0.9523,0.0476,0.0001
+2024-05-08,"Apple Launches iPads In All Prices and Sizes --- How to decide on the best device based on price, portability and power",positive,0.9967,0.0033,0.0
+2024-05-09,Apple iPad Ads Draw Growing Backlash,negative,0.095,0.7042,0.2008
+2024-05-09,"Buybacks Are Back: Corporate America Is on a Spending Spree; Share repurchases in the first quarter are up sharply, led by Meta and Apple",negative,0.0,1.0,0.0
+2024-05-09,"Apple Apologizes for iPad Ad Depicting Crushed Creative Tools; Company, which had drawn widespread criticism on social media, says the advertisement fell short of its standards",neutral,0.0,0.0,1.0
+2024-05-10,Apple Says iPad Ad Falls Short of Standards,neutral,0.0,0.0,1.0
+2024-05-10,Apple Apologizes for iPad Ad Depicting Crushed Creative Tools; Company says it won't run advertisement on television after it faced widespread criticism on social media,neutral,0.4967,0.0002,0.5031
+2024-05-10,"Buybacks Are Back, With Meta, Apple Leading Spending Spree",negative,0.0,1.0,0.0
+2024-05-12,Apple Retail Employees at Maryland Store Vote to Authorize Strike; The iPhone maker continues to negotiate with union representing about 100 store workers,positive,1.0,0.0,0.0
+2024-05-13,iPad Pro vs. MacBook: The Great Apple Laptop Trade-Off; Apple's latest iPad Pro is superior to a Mac in many ways. Yet a Mac beats the iPad on the most important thingsoftware.,negative,0.0,1.0,0.0
+2024-05-13,Apple Staff in Maryland Vote Strike,positive,0.9979,0.0,0.0021
+2024-05-14,"Comcast to Launch Streaming Bundle of Peacock, Netflix and Apple TV+; New bundle, called StreamSaver, to be available exclusively to subscribers of Comcast's internet service",positive,1.0,0.0,0.0
+2024-05-15,"Comcast Plans Streaming Bundle Of Peacock, Netflix and Apple TV+",positive,1.0,0.0,0.0
+2024-05-20,"I Tried Microsoft's New AI-Focused PCs. Windows Is Exciting Again. Microsoft CEO Satya Nadella told our columnist new efficient, powerful chips equip Windows Copilot+ laptops to compete with Apple's MacBooks",negative,0.0,1.0,0.0
+2024-05-21,"Sonos Picks a Good Time to Plug Into Headphones; Premium-headphone market is soaring while Sonos speaker sales are sagging, but competition with Apple will be fierce",neutral,0.0003,0.013,0.9867
+2024-05-21,"A Chinese Phone Maker Did Something Apple Couldn't: Make an EV; Xiaomi makes rice cookers, smartphones, lamps and now a car, showing how low the barriers to entry have become in the world of electric vehicles",positive,0.9999,0.0001,0.0
+2024-05-22,China Phone Maker One-Ups Apple by Introducing Own EV,positive,0.9998,0.0002,0.0001
+2024-05-24,Apple Says These Are the 100 Best Albums. Even If You Think Different. Why did a trillion-dollar company make a music list that would make people lose their minds?,neutral,0.0106,0.0002,0.9892
+2024-05-29,"Argentina's President Tours World to Meet Supporters, Leaving Setbacks at Home; Libertarian Javier Milei travels to California to promote Argentina to Google, Apple and Meta CEOs",positive,1.0,0.0,0.0
+2024-05-31,"Apple Supplier STMicroelectronics to Build $5.4 Billion Chip Plant in Italy; The new facility in Catania, Sicily, will produce silicon-carbide semiconductor products for power devices and modules",positive,1.0,0.0,0.0
+2024-06-05,How Broken Are Apple's Parental Controls? It Took 3 Years to Fix an X-Rated Loophole. Apple's Screen Time continues to be marred by bugs that let its youngest users circumvent parental controls,neutral,0.0484,0.0752,0.8763
+2024-06-05,"McDonald's Loses Big Mac Trademark Over Chicken in Europe; Decision means any company in the bloc can now use the name to sell poultry products, and use the word 'Mac' in their company name",positive,1.0,0.0,0.0
+2024-06-06,"Tech Pullback Weighs on S&P 500 Ahead of Jobs Data; Declines in Nvidia, Apple help offset gains in other stocks",neutral,0.0006,0.029,0.9704
+2024-06-06,"Nvidia Market Cap Tops $3 Trillion, Surpasses Apple",negative,0.0,1.0,0.0
+2024-06-06,Apple Took 3 Years To Fix X-Rated Bug --- Young users are able to circumvent parental controls set in Screen Time,neutral,0.1378,0.0064,0.8558
+2024-06-06,"How Apple Fell Behind in the AI Arms Race; After years of playing it safe with generative artificial intelligence, Apple is set to unveil new features next week",positive,0.8445,0.1515,0.004
+2024-06-06,Business News: A McDonald's Trademark Is Curbed in EU --- Court rules chain doesn't have sole right to call chicken sandwiches 'Big Mac',positive,0.9995,0.0,0.0005
+2024-06-07,Tech-Stock Pullback Weighs on S&P 500 --- Declines in Nvidia and Apple were offset in part by gains in other areas,neutral,0.0001,0.0,0.9999
+2024-06-07,"Apple Fell Behind in AI Arena, Catching Up Is Goal",neutral,0.0579,0.0445,0.8976
+2024-06-07,AI May Not Be What Sells Apple's Next iPhone; Three weak sales cycles in a row have left smartphone poised for an upturn in the next round,neutral,0.0,0.01,0.99
+2024-06-10,"Apple Intelligence: A Guide to Apple's AI-In-Everything Strategy; A bunch of AI features are coming to iOS 18, iPadOS 18 and MacOS Sequoia in the fall. Meaningful upgrade or marketing glitz? Our columnist breaks it down.",positive,0.9933,0.0001,0.0067
+2024-06-10,"Apple Introduces 'Apple Intelligence,' New OpenAI Partnership as AI Takes Center Stage; Under pressure to deliver new features, Apple showed off an AI system that can assist users in myriad ways, emphasizing privacy at WWDC event",positive,0.9777,0.0034,0.0189
+2024-06-11,"What the Apple-OpenAI Deal Means for Four Tech Titans; Deal strengthens OpenAI's position, raises questions about startup's relationship with Microsoftand is a setback for Google",negative,0.0003,0.9989,0.0008
+2024-06-11,"S&P 500 Extends Record Ahead of Inflation Data, Fed Meeting; AI optimism drives shares of Apple higher, lifting tech stocks",negative,0.0,1.0,0.0
+2024-06-11,Apple Unveils Plans to Bring AI To iPhone --- Personalized system to offer features using ChatGPT and stress privacy,positive,0.9998,0.0,0.0002
+2024-06-11,"Apple's AI Evolution Is Not Quite a Revolution; Late entry to AI race brings many features similar to Microsoft and Google offerings, which might curb investors' recent enthusiasm",neutral,0.0,0.0,1.0
+2024-06-11,"Apple Intelligence: A Guide to Apple's AI-In-Everything Strategy; A bunch of AI features are coming to iOS 18, iPadOS 18 and MacOS Sequoia in the fall. Meaningful upgrade or marketing glitz? Our columnist breaks it down.",positive,0.9933,0.0001,0.0067
+2024-06-11,"Dow Slides 150 Points, Nasdaq Rises; The Fed begins its June policy meeting today; Apple stock climbs",negative,0.0872,0.9128,0.0
+2024-06-12,Apple-OpenAI Deal Reorders Tech Sector,positive,0.9998,0.0,0.0002
+2024-06-12,"Password App, iPad Calculator, Scheduled Text Messages: What's Coming Soon to Your Apple Devices; Apple talked a big AI game for iOS 18, iPadOS 18 and MacOS Sequoia, but 10 other tools are also on our fall update radar",positive,1.0,0.0,0.0
+2024-06-12,"AI Investments Boost Technology Stocks --- S&P 500, Nasdaq extend highs, led by record-breaking day for shares of Apple",negative,0.0,1.0,0.0
+2024-06-13,Apple Sued by Employees Alleging Unequal Pay for Women; Lawsuit says company's hiring and performance-review practices routinely slant toward men,neutral,0.0002,0.0001,0.9997
+2024-06-14,Apple Is Sued Over Wages For Women --- Employees say hiring and review practices routinely slant toward men,positive,0.803,0.001,0.196
+2024-06-14,"The Score: Paramount, Apple, Tesla and More Stocks That Defined the Week; Here are some of the major companies whose stocks moved on the week's news",positive,1.0,0.0,0.0
+2024-06-15,Apple Gives Banks a Bigger Bite of Its Payment Features; Cards might be able to touch more transactions with changes to Apple Pay,positive,0.5062,0.4937,0.0001
+2024-06-17,"Apple Is Shutting Down Its Buy Now, Pay Later Service; Decision comes just over a year after Apple Pay Later was introduced",positive,0.9964,0.0,0.0036
+2024-06-18,"Business News: Apple Shuts Its Buy-Now, Pay-Later Service",positive,0.632,0.0,0.368
+2024-06-20,China Frustrates Apple's AI Push --- Tech giant needs a local partner because Western chatbots aren't available there,neutral,0.0059,0.0,0.994
+2024-06-20,"For Apple's AI Push, China Is a Missing Piece; ChatGPT isn't available in China, prompting Apple to seek local partner for its artificial-intelligence services",neutral,0.0091,0.0,0.9909
+2024-06-21,Apple Says Regulatory Concerns Might Prevent Rollout of AI Features in Europe; The iPhone maker said the EU's tech regulations requiring interoperability might risk 'user privacy and data security',neutral,0.0019,0.0001,0.9981
+2024-06-21,"The Score: Nvidia, Apple, CarMax and More Stocks That Defined the Week; Here are some of the major companies whose stocks moved on the week's news",positive,1.0,0.0,0.0
+2024-06-22,EXCHANGE --- EU Rules Threaten Apple's AI Rollout --- iPhone maker says regulations might risk 'user privacy and data security',neutral,0.0,0.0001,0.9999
+2024-06-23,"Apple, Meta Have Discussed an AI Partnership; The longtime rivals have held talks about potentially integrating Meta's generative AI model into Apple Intelligence",positive,1.0,0.0,0.0
+2024-06-24,Apple And Meta Discuss Becoming AI Partners,positive,0.9993,0.0006,0.0001
+2024-06-24,Apple Hit by First Charges Under New European Tech Law; Move cements iPhone maker as company EU regulators are so far targeting most aggressively under digital competition law,negative,0.0925,0.7391,0.1683
+2024-06-25,Apple Hit By First Charges Under EU Tech Law --- Move marks iPhone maker as company so far most targeted by the measure,neutral,0.0048,0.0137,0.9815
+2024-06-26,"Why You Shouldn't Buy an iPhone This Summer. All the Reasons, From A to I. Avoid Apple Watches and some AirPods, too. Our columnist's guide to safe summer shopping.",positive,0.9997,0.0002,0.0001
+2024-06-29,"Apple Watch Is Becoming Doctors' Favorite Medical Device; Some doctors are telling patients to get the watch to manage their conditions. Researchers study how it could be used for heart disease, post-surgery recovery and other conditions.",positive,0.9999,0.0001,0.0
+2024-07-10,"To See the Future of AI on iPhones, Check Out Samsung; Apple's smartphone rival adds more generative AI features and says they are being used more than expected",negative,0.0018,0.9981,0.0001
+2024-07-11,Samsung AI Phone to Offer Clues on Apple,positive,0.9968,0.0023,0.001
+2024-07-11,"Apple, EU Settle Long-Running Mobile-Payments Probe; European Commission says Apple has addressed its concerns that the iPhone maker was stifling competition among mobile-wallet providers",neutral,0.0137,0.0003,0.986
+2024-07-12,"Apple, EU Settle Mobile-Payments Probe",positive,0.9999,0.0,0.0001
+2024-07-12,Laurene Powell Jobs Pays About $70 Million for San Francisco's Most Expensive Home; The billionaire philanthropist and widow of Apple visionary Steve Jobs purchased the Pacific Heights mansion in an off-market deal,positive,1.0,0.0,0.0
+2024-07-15,"Apple, Samsung Phone Shipments Rose in Second Quarter; Quarterly shipments of Apple's iPhones rose 1.5% from a year earlier",negative,0.0,1.0,0.0
+2024-07-24,Apple Under Investigation in Spain Over Treatment of App Store Developers; The Spanish investigation adds to a growing list of headaches that Apple is facing in Europe,neutral,0.0,0.0,1.0
+2024-07-25,Business News: Spanish Antitrust Officials Probe Apple's App Store,positive,0.998,0.0,0.002
+2024-07-26,Apple's iPhone Lost More Ground in China in Second Quarter; Huawei and Xiaomi's shipments growth also pressured Apple's market share,neutral,0.0,0.0,1.0
+2024-07-27,EXCHANGE --- Apple Slips From Top Five in China As Local Smartphone Brands Ascend,neutral,0.1121,0.0001,0.8878
+2024-07-27,"OFF DUTY --- Adventure & Travel: A Big-Apple Bike Blitz --- Eager to better understand the city, our writer embarked on a peculiar quest -- to visit all 702 of the bike-sharing stations in Manhattan. Curious travelers take note: Here's what he found.",positive,0.9999,0.0001,0.0
+2024-07-29,"S&P 500 Edges Up With Tech Earnings Looming; Microsoft, Meta, Amazon and Apple report results in coming days",positive,0.971,0.0288,0.0001
+2024-07-29,"It's a Cruel Summer for Big Tech Stocks; The Magnificent Seven confront their next test when Microsoft, Meta, Amazon.com and Apple report results this week",positive,0.9916,0.0007,0.0078
+2024-07-29,Apple Intelligence: Here's When the New AI Features Come to the iPhone and iPad; The new Siri and other tools won't be available until iOS 18.1 is released later this fall. This is the timeline.,positive,1.0,0.0,0.0
+2024-07-30,"Big Tech Stocks Keep Falling Ahead of Earnings Deluge, Fed Meeting; Meta Platforms, Amazon and Apple will report in the coming days",positive,1.0,0.0,0.0
+2024-07-31,"Tech Stocks Extend Slide Amid Earnings and the Fed --- Meta Platforms, Amazon and Apple will report in the coming days",positive,0.994,0.006,0.0
+2024-08-01,"Apple's iPhone Sales Slide, but Investors Still Expect AI Rally; Company is preparing to release 'Apple Intelligence' in the fall, which investors hope will lead users to upgrade their phones",negative,0.0,0.9999,0.0001
+2024-08-02,"The Score: CrowdStrike, Apple, Intel and More Stocks That Defined the Week; Here are some of the major companies whose stocks moved on the week's news",positive,1.0,0.0,0.0
+2024-08-02,Apple's iPhone Sales Slide Again --- Company banks on coming artificial- intelligence features to boost demand,negative,0.0,1.0,0.0
+2024-08-02,"Apple's iPhone Sales Slide, but Investors Still Expect AI Rally; Company is preparing to release 'Apple Intelligence' in the fall, which investors hope will lead users to upgrade their phones",negative,0.0,0.9999,0.0001
+2024-08-03,Warren Buffett's Berkshire Hathaway Slashes Apple Stake; The company sold stocksincluding much of its giant Apple stakein the second quarter,positive,1.0,0.0,0.0
+2024-08-05,Business News: Berkshire Hathaway Slashes Apple Stake by Nearly Half --- Second-quarter stock sales helped lift its cash hoard to $276.94 billion,negative,0.0,1.0,0.0
+2024-08-06,"Google and Apple Can Afford to Play Long Game After Antitrust Ruling; Court decision faces years of appeals, and the ultimate remedy may not be fatal to lucrative arrangement",positive,0.9071,0.0119,0.081
+2024-08-06,"Google's Antitrust Loss Set to Reshape Search and Mobile Industries; End of paid search engine placement would affect companies including Microsoft, Apple and Samsung",neutral,0.0012,0.0,0.9988
+2024-08-09,"Every Olympic Champion Wins a Medal. This One Also Gets Free Colonoscopies. Gold medal winners often earn cash prizes for their efforts. When Carlos Yulo won an Olympic title, his prize haul included free wedding photos, haircuts and a lifetime supply of mac-and-cheese.",positive,0.9999,0.0,0.0
+2024-08-09,"The Score: Apple, Walt Disney, Eli Lilly and More Stocks That Defined the Week; Here are some of the major companies whose stocks moved on the week's news",positive,1.0,0.0,0.0
+2024-08-10,"Why Every Big Tech Company Has Failed to Dethrone Nvidia as King of AI; Nvidia, like Apple, shows that if you want to become a giant, you've got to be as good at software as you are at hardware",negative,0.07,0.8879,0.0421
+2024-08-10,"EXCHANGE --- The Score / The Business Week in 6 Stocks: Apple Gets a Bite, Eli Lilly Gains Ground",negative,0.0,1.0,0.0
+2024-08-14,Google's New Phones Aren't Really About the Phones; Latest Pixel series is another distribution channel for Google's premium AI servicesplus a bit of a flex against Apple,neutral,0.2193,0.004,0.7767
+2024-08-16,"Apple's Hold on the App Store Is Loosening, at Least in Europe; Epic Games, Spotify among the developers taking advantage of European rule changes",negative,0.233,0.659,0.108
+2024-08-17,"EXCHANGE --- Apple's Hold on App Store Is Loosening --- Epic Games, Spotify among developers taking advantage of EU rule changes",positive,0.5011,0.4923,0.0066
+2024-08-17,"Apple Opens Tap-to-Pay to Competitors, but Can They Take Advantage? Payment companies and banks might be able to vie for more digital checkouts in stores",negative,0.002,0.998,0.0
+2024-08-19,"GM Is Cutting More Than 1,000 Workers From Its Software Business; The move comes after review by the division's new co-leaders, both Apple veterans",positive,1.0,0.0,0.0
+2024-08-21,"U.K. Authority Closes Competition Probes Into Google, Apple App Stores; The authority said it expects to consider competition concerns regarding the U.S. tech giants' app stores under a new regulatory regime",positive,0.9806,0.0001,0.0193
+2024-08-22,"Apple to Let iPhone Users Delete Safari, Other Native Apps to Comply With EU Law; Company to align products with the bloc's digital competition law",positive,1.0,0.0,0.0
+2024-08-23,Business News: EU iPhone Users Can Delete Default Apps,positive,0.9999,0.0,0.0001
+2024-08-26,"Apple Plans Sept. 9 Event; New iPhone and AI Features Expected; The AI features, which the company announced in June, could help users write emails and create images",positive,0.6522,0.3478,0.0
+2024-08-26,"Apple's Top Finance Executive to Step Down; Luca Maestri, who kept spending down while rivals splurged, is one of a number of top company leaders who are in their early 60s",neutral,0.0041,0.0,0.9958
+2024-08-27,Business News: iPhone 16 Expected At Apple's Sept. Event,positive,0.9997,0.0003,0.0
+2024-08-27,Apple's CFO Set To Leave Position,positive,0.9994,0.0,0.0006
+2024-08-27,Australia's Zip in Talks With Apple for U.S. Buy-Now-Pay-Later Integration; Zip is also looking to embed its product at the point-of-sale with more major retailers.,positive,1.0,0.0,0.0
+2024-08-28,Australia's Zip Is in Talks With Apple,positive,1.0,0.0,0.0
+2024-08-29,"Apple, Nvidia Are in Talks to Invest in OpenAI; Tech giants would join multibillion-dollar funding round alongside Microsoft, Thrive Capital",positive,1.0,0.0,0.0
+2024-08-30,"Apple, Nvidia in OpenAI Talks --- Tech giants would join multibillion- dollar funding round alongside Microsoft",positive,1.0,0.0,0.0
+2024-09-02,"Apple Helped Nix Part of a Child Safety Bill. More Fights Are Expected. As lawmakers debate how to regulate teen smartphone use, Apple is pushing back on efforts for it to enforce age restrictions",positive,0.8693,0.0848,0.0459
+2024-09-04,"A Greenwich Home Set on 66 Acres Hits the Market for $35 Million; The Connecticut estate, which has been in the same family since 1940, has an apple orchard, vegetable gardens and four chicken coops",positive,1.0,0.0,0.0
+2024-09-04,Apple Pushes Back Over Enforcing Age Rules,neutral,0.1181,0.0266,0.8553
+2024-09-05,"Apple Needs Time to Be on Its Side for AI iPhones; Wall Street sees moderate iPhone sales gains over next two years, as AI features will roll out slowly",negative,0.0055,0.9943,0.0002
+2024-09-09,"How the iPhone 16 and iPhone 16 Pro Compare With Last Year's iPhone 15; The new lineup features better cameras, bigger screens and a new button. But the generative-AI Apple Intelligence will show off the devices' biggest advances.",negative,0.0,0.9999,0.0
+2024-09-09,"Apple Unveils an AI iPhone; The company, which has faced slumping sales in its signature product, released the iPhone 16, with an upgraded Siri, AI text editing and photo-recognition tools",neutral,0.0,0.0,1.0
+2024-09-09,Apple Bets On AI To Spur iPhones,negative,0.0056,0.9943,0.0002
+2024-09-09,"Apple Watch Series 10 Gets Bigger Screen, Thinner Bodyand a Sleep Apnea Detector; Apple celebrates the 10-year anniversary with a familiar yet streamlined redesign",negative,0.0008,0.9992,0.0
+2024-09-10,Apple's Challenge in China Rises With New Rival Phones and AI Delay; Huawei counterprograms iPhone 16 event with introduction of three-way foldable smartphone,neutral,0.0,0.0,1.0
+2024-09-10,"Apple's New iPhones Could Boost AI Usage Inside Companies. But CIOs Have Questions. While CIOs say the offering could fuel more generative artificial-intelligence usage, they also have concerns around the technology's handling of sensitive data",neutral,0.0,0.0,1.0
+2024-09-10,"AirPods Will Soon Be Hearing Aidsand More From Apple's New AirPod Lineup; With four options to choose fromand a huge software update coming to the flagship modelit's trickier than just picking good, better or best",negative,0.0011,0.9989,0.0
+2024-09-10,"Apple Watch Series 10 Gets Bigger Screen, Thinner Body --- Redesign includes detectors for water depth, temperature and sleep apnea",positive,1.0,0.0,0.0
+2024-09-10,New iPhone AI Tools Improve On Siri,negative,0.0,1.0,0.0
+2024-09-10,"iPhone 16 First Look: While We Wait for Apple Intelligence, Check Out These Buttons; Our columnist tried out all four new iPhone models. She understands why the AI software is still in betabut the battery life and new controls are also worth the look.",positive,0.998,0.0019,0.0001
+2024-09-10,Apple Loses Court Battle Over $14 Billion Irish Tax Bill; EU top court separately upholds $2.7 billion fine against Google over search results,positive,0.6102,0.0673,0.3225
+2024-09-11,"Google, Apple Lose EU Battles Over Hefty Payments",neutral,0.0,0.0,1.0
+2024-09-11,Apple's Challenge in China Rises With New Phones and an AI Delay,neutral,0.0,0.0,1.0
+2024-09-14,What Is AI Best at Now? Improving Products You Already Own; Apple and Google are showing how AI is really a feature in other products at this stage,positive,0.9753,0.0247,0.0
+2024-09-14,Apple Has a Hot New Product. It's a Hearing Aid. The world's most valuable company just turned its top-selling headphones into low-cost hearing aidsand it's quietly a huge moment,negative,0.0,0.9999,0.0
+2024-09-15,"After a Year Without Fresh Food, a Sudden Reprieve in Gaza: Apples; Rare delivery caused some to celebrate, reflecting widespread hunger",neutral,0.0002,0.0,0.9998
+2024-09-16,AirPods 4 With Noise Cancellation: Your New Best Buds; Apple's new earbuds hit the budget-feature sweet spot,neutral,0.0022,0.0606,0.9373
+2024-09-16,"iOS 18 Is Here: A Worthy iPhone Upgrade, No AI Necessary; Message scheduling, app icon customization, calculator tricks, improved texting with Android friends, and more. Just no Apple Intelligenceyet.",negative,0.002,0.998,0.0
+2024-09-17,"JPMorgan in Talks With Apple to Take Over Credit Card From Goldman; Bank could become the new Apple credit-card issuer, but is seeking concessions from the tech company",positive,0.9971,0.0001,0.0028
+2024-09-17,"Apple's iOS 18 Software Update Has It All, Except for the AI --- Message scheduling, app icon customization, improved texting with Android friends, and more",negative,0.0012,0.9988,0.0
+2024-09-18,JPMorgan In Talks On Deal For Apple Credit Card,positive,1.0,0.0,0.0
+2024-09-18,"Want an iPhone 16 Review? Just Ask Joannabot; After more than a decade of reviewing iPhones, columnist Joanna Stern has handed the reins to her generative-AI assistant to discuss Apple's latest",positive,1.0,0.0,0.0
+2024-09-19,"To Review iPhone 16, We Created Joannabot --- After more than a decade of surveying iPhones, columnist Joanna Stern hands the reins to her generative-AI assistant to discuss Apple's latest",positive,1.0,0.0,0.0
+2024-09-19,"EU to Offer Apple Guidance on Digital Rules Compliance; The Digital Markets Act sets out a long list of rules aimed at boosting competition in digital advertising, online search and app ecosystems",positive,0.9987,0.0006,0.0007
+2024-09-20,EU to Offer Apple Guidance On Digital Rules Compliance,positive,0.9998,0.0,0.0001
+2024-09-24,"TikTok to Shut Down Short-Lived Music-Streaming Service; The service will go offline in November, concluding yearlong effort to compete with Spotify, Apple",positive,0.9916,0.0,0.0084
+2024-09-28,U.S. News: Apple No Longer in Talks to Join OpenAI Funding Round,positive,1.0,0.0,0.0
+2024-09-28,Apple No Longer in Talks to Join OpenAI Investment Round; Company behind ChatGPT is aiming to raise around $6.5 billion in funding set to close next week,positive,1.0,0.0,0.0
+2024-09-28,Touch Screens Are Over. Even Apple Is Bringing Back Buttons. Product designers are embracing how users actually feel after years of pushing flat and sleek,positive,1.0,0.0,0.0
+2024-09-29,Apple's New Password Manager Is Free. That's Just One Reason to Use It. Your saved passwords are now in one easy-to-access place,positive,0.998,0.002,0.0001
+2024-10-05,The Hearing Aid Revolution That Wasn't; Over-the-counter models have high return rates. Can Apple's AirPods Pro 2 change things?,negative,0.0073,0.9873,0.0054
+2024-10-08,Family & Tech: Will Apple Revolutionize Hearing Aids? --- Other over-the-counter models have seen low sales and high return rates,neutral,0.0,0.005,0.995
+2024-10-09,"When Cell Service Is Down, You Can Send iPhone Texts via Satellite; Hurricane Milton could disrupt phone and Wi-Fi networks. How to stay connected with iOS 18.",neutral,0.0001,0.0,0.9999
+2024-10-09,Freddie Mac to End Blacklist of Real-Estate Broker Meridian; Meridian Capital Group has overhauled its risk and controls and will resume business with the mortgage-finance giant next year,positive,0.8355,0.1635,0.001
+2024-10-09,McDonald's Is Bringing Chicken to the Big Mac; The twist on the flagship sandwich shows how fast-food companies are adding more of the protein to their menus,positive,0.6125,0.3874,0.0001
+2024-10-10,Big Mac Gets a McMakeover in Chicken Option,positive,0.9995,0.0005,0.0
+2024-10-10,Finance News: Freddie Mac to End Blacklist of Meridian --- Real-estate broker will resume business with the mortgage- finance giant in 2025,positive,0.9999,0.0001,0.0
+2024-10-10,China Detains Employees at Apple iPhone Factory Run by Foxconn; Taiwan says investor confidence may be damaged after four Taiwanese are held,neutral,0.0,0.0,1.0
+2024-10-11,Porch Pirates Steal AT&T iPhone Deliveries,positive,0.9998,0.0,0.0002
+2024-10-13,"Apple Headset Stalls, Struggles to Attract Killer Apps in First Year; Virtual-reality software developers haven't embraced Vision Pro, which has lower-than-expected sales in its first year",neutral,0.0,0.0,1.0
+2024-10-14,"Apple Headset Runs Into Struggles --- App developers fail to embrace Vision Pro, and the device's sales are disappointing",neutral,0.0,0.0,1.0
+2024-10-16,"Nvidia Will Dominate Big Tech's Earnings Season Again; Capital spending by Microsoft, Google, Amazon and Meta is expected to keep surging, while Apple's AI debut gets clouded",positive,0.7081,0.0972,0.1948
+2024-10-18,"Apple Headset Stalls, Struggles to Attract Killer Apps in First Year; Virtual-reality software developers haven't embraced Vision Pro, which has lower-than-expected sales in its first year",neutral,0.0,0.0,1.0
+2024-10-21,Tim Cook on Why Apple's Huge Bets Will Pay Off; The CEO of the world's most valuable company led two of the biggest product launches of his tenure this yearand believes they will be as life-changing for the rest of us as they are for him,negative,0.0011,0.9989,0.0
+2024-10-21,We Tried Apple's New Hearing Testand the New AirPods Pro Hearing Aids; Apple's new clinical-grade diagnostics and hearing assistance are potential life changers. You just need to find them.,positive,0.9992,0.0007,0.0001
+2024-10-22,"Hearing Tests and Aids Coming for AirPod Pro --- Apple's clinical-grade diagnostics, assistance are potential life changers",positive,0.986,0.0139,0.0002
+2024-10-22,Goldman Sachs Faces CFPB Fine Over Credit-Card Business; An enforcement action is expected as soon as this week pertaining to bank's Apple credit-card program,positive,0.746,0.0016,0.2524
+2024-10-23,"Apple Intelligence Isn't Very Smart Yetand Apple's OK With That; Our columnist reviews the first wave of AI features coming to iPhones with iOS 18.1, and asks Apple's software chief why so much is still missing",positive,0.9987,0.0009,0.0004
+2024-10-26,Every Company Needs to Put on a Show Like Apple; Steve Jobs's annual product launches can be a surprisingly effective management toolwhether you're in the business of tech or tacos,negative,0.003,0.997,0.0
+2024-10-28,"iOS 18.1 Is Here: Apple Intelligence, New Siri Look, AirPod Hearing Aids and More; If you've got an iPhone 15 Pro or any new 16 model, AI now summarizes notifications, cleans up photos and helps rewrite text",positive,0.9995,0.0005,0.0
+2024-10-28,Apple iPhone 16 Sales Banned in Indonesia Over Investment Issue; Other Apple products aren't subject to the ban,positive,0.5608,0.0001,0.4391
+2024-10-28,"Why Apple's AI Success Hinges on the iPhone; Big tech rivals can distribute AI widely through their services, while Apple's hardware-centric business needs its devices as the touchpoint",negative,0.397,0.6028,0.0002
+2024-10-29,"Latest iPhone Can't Be Sold in Indonesia --- Apple falls short in local investment, ministry says; other products not barred",positive,0.7238,0.0001,0.2761
+2024-10-31,"Apple Sales Hit Quarterly Record as iPhone Business Rebounds; The company's smartphone, which accounts for half its revenue, saw renewed growth ahead of the release of Apple Intelligence this month",negative,0.0,1.0,0.0
+2024-11-01,iPhone Sales Boost Apple to a Record,negative,0.0,1.0,0.0
+2024-11-01,"Apple Sales Hit Quarterly Record as iPhone Business Rebounds; The company's smartphone, which accounts for half its revenue, saw renewed growth ahead of the release of Apple Intelligence this month",negative,0.0,1.0,0.0
+2024-11-02,Warren Buffett's Berkshire Hathaway Slashes Apple Stake Again; The conglomerate's cash pile tops $300 billion for the first time,positive,1.0,0.0,0.0
+2024-11-04,Business News: Buffett's Firm Cuts Apple Stake --- Berkshire Hathaway also reduced its holdings in Bank of America's shares,neutral,0.1481,0.0386,0.8133
+2024-11-12,"When Did Apple's Notes App Become an Extension of Our Brains? The simple iPhone app is a receptacle for nearly everything: passwords, grocery lists, baby-name brainstorms, the occasional 'Vanderpump' brain dump",positive,0.9997,0.0,0.0003
+2024-11-14,Apple Faces $3.8 Billion Antitrust Legal Claim Over iCloud; Consumer-protection group Which? said the iPhone maker abuses its dominance by tying customers to its iCloud storage service,neutral,0.0,0.0,1.0
+2024-11-15,Apple Faces $3.8 Billion Antitrust Legal Claim,neutral,0.0248,0.0022,0.973
+2024-11-21,Apple Offers $100 Million Investment in Indonesia to Lift iPhone 16 Ban; Indonesia blocked sales of Apple's latest iPhone 16 handsets in October,neutral,0.0001,0.0,0.9999
+2024-11-22,"U.K. Competition Watchdog Recommends Investigating Apple, Google Mobile Ecosystems; The CMA said Apple and Google have an effective duopoly on mobile ecosystems",positive,0.998,0.0018,0.0002
+2024-11-22,"EU Drops Probe of Apple's Treatment of Rival Audiobook, Ebook Developers in App Store; The commission said that closing the probe doesn't mean Apple hasn't broken EU rules",positive,0.9998,0.0,0.0002
+2024-11-22,Apple Proposes $100 Million Indonesia Investment to End Ban,positive,1.0,0.0,0.0
+2024-11-22,Huawei's Chip Advances Threaten Apple in China; Latest device is coming next week from Chinese company as it pushes ahead in technology despite U.S. sanctions,positive,0.9256,0.0722,0.0022
+2024-11-22,Huawei Steps Up Challenge To iPhone,neutral,0.0001,0.0004,0.9995
+2024-11-23,"EXCHANGE --- Apple, Google Face U.K. Antitrust Probe Over Mobile-Phone Browser Dominance",positive,0.972,0.0002,0.0278
+2024-11-24,"How Tim Cook Cracked the Code on Working With Trump; The election is leading to a return of personal lobbying by CEOs, hoping to develop ties with the new administration; Cook's one-topic meals",positive,0.9996,0.0,0.0003
+2024-11-25,Apple's Cook Carefully Crafted Personal Connection to Trump,positive,0.9996,0.0003,0.0001
+2024-11-27,"Why This Pear Upside-Down Cake Should Be Your New Holiday Classic; Apple pie is nice, but this foolproof pear and cardamom upside-down cake is a far easier bake with a surprising dash of spice and a centerpiece-worthy starburst of pears on top.",negative,0.0,1.0,0.0
+2024-11-30,"The iPhone's 'Lockdown Mode': What It Is and Who Should Consider Using It; The feature is largely for high-profile targets. But others might think it's worth using, despite the inconvenience.",neutral,0.2544,0.0004,0.7451
+2024-11-30,"OFF DUTY --- Eating & Drinking -- The Bakeaway: Apple Pie Is Great, But... --- ...this festive upside-down cake is a far easier bake with a surprising dash of spice.",negative,0.0003,0.9995,0.0002
+2024-12-02,"Building Apple Products Has Become a Side Hustle for China's Biggest EV Maker; BYD has grown into a top iPad assembler and has put around 100,000 people to work for Tim Cook's company",negative,0.0785,0.9215,0.0
+2024-12-05,Cybersecurity (A Special Report) --- The iPhone's 'Lockdown Mode': What It Is and Who Should Consider Using It: The feature is largely for high-profile targets. But others might add the option despite the inconvenience.,positive,0.9532,0.001,0.0458
+2024-12-09,"Apple Tops the List of Best-Managed Companies of 2024; Tech companies hold six of the top 10 spots, while Mastercard jumped to fifth place from 24th last year",negative,0.0,1.0,0.0
+2024-12-11,"iOS 18.2 Review: The AI Apple Promised Us; ChatGPT integration, Genmojis and morethe newest Apple Intelligence update gives the iPhone 16 a reason for being",positive,0.9661,0.0333,0.0006
+2024-12-13,"C-Suite Strategies (A Special Report): Management Top 250 --- Apple Tops the List of Best-Managed Companies of 2024: Tech companies hold six of the top 10 spots, while Mastercard jumped to fifth place from 24th last year",negative,0.0,1.0,0.0
+2024-12-15,"Apple Plans Thinner, Foldable iPhones to Revive Growth; Smartphone sales at the company have stagnated after years of largely minor upgrades to the devices",neutral,0.0,0.0,1.0
+2024-12-16,Apple Sees Foldable iPhone As a Key To Growth,negative,0.0,1.0,0.0
+2024-12-19,Apple Faults Meta For Software-Access Requests as EU Crackdown Looms; Apple said companies might attempt to abuse the EU's Digital Markets Act to access sensitive user data,neutral,0.0,0.0,1.0
+2024-12-19,Apple Faults Meta for Software-Access Requests as EU Crackdown Looms; Apple said companies might attempt to abuse the EU's Digital Markets Act to access sensitive user data,neutral,0.0,0.0,1.0
+2024-12-20,Apple Pushes Back Against Meta's Requests for Access --- EU is pressing the iPhone maker to open software tools to outside developers,positive,0.9767,0.0219,0.0014
+2024-12-22,"Apple's App Store Puts Kids a Click Away From a Slew of Inappropriate Apps; Analysis recommends that Apple, an emerging target for digital-safety advocates, apply independent review for software age ratings",positive,1.0,0.0,0.0
+2024-12-23,"Kid Safety On Apple's App Store Is Too Lax, Study Says",positive,0.9643,0.0003,0.0354
