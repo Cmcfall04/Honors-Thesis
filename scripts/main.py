@@ -8,7 +8,6 @@ regression model to predict next-day stock movement.
 import time
 from pathlib import Path
 from typing import Dict, List, Sequence
-
 import matplotlib.pyplot as plt
 import pandas as pd
 import requests
@@ -82,7 +81,8 @@ MODEL_RESULTS_PATH = Path("../results/model_results.md")
 CONFUSION_MATRIX_PATH = Path("../results/confusion_matrix.png")
 
 # Output label order produced by the FinBERT model.
-LABELS = ["positive", "negative", "neutral"]
+# NOTE: FinBERT uses [neutral, positive, negative] order, not [positive, negative, neutral]!
+LABELS = ["neutral", "positive", "negative"]
 
 
 # --- Data collection -----------------------------------------------------------------
@@ -268,11 +268,12 @@ def predict_sentiment(text: str, tokenizer, model) -> Dict[str, float]:
     logits = outputs.logits
     probabilities = torch.softmax(logits, dim=-1)
     predicted_class = torch.argmax(logits, dim=1).item()
+    # FinBERT outputs: [neutral, positive, negative]
     return {
         "sentiment": LABELS[predicted_class],
-        "positive": probabilities[0][0].item(),
-        "negative": probabilities[0][1].item(),
-        "neutral": probabilities[0][2].item(),
+        "neutral": probabilities[0][0].item(),
+        "positive": probabilities[0][1].item(),
+        "negative": probabilities[0][2].item(),
     }
 
 

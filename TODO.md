@@ -247,3 +247,7 @@ This document tracks the development roadmap for the Apple Stock Sentiment Analy
 **Last Updated**: October 15, 2024  
 **Project Status**: Baseline complete, ready for extensions  
 **Next Action**: Implement technical indicators (moving averages + RSI)
+
+- Also check that the Sentiment analysis is actually reading healine right and not lying about sentiment
+- Change sentiment from 1,0,-1 to mores specific values, add range for slightly positive, slightly negative for more range
+- Add additional information(Fnacial information), make two models, with all the info and one w all the info and w the sentiment analysis
