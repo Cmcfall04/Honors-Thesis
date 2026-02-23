@@ -22,8 +22,35 @@ from sklearn.metrics import (
     confusion_matrix,
     precision_recall_fscore_support,
 )
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import TimeSeriesSplit
+from sklearn.preprocessing import StandardScaler
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
+import numpy as np
+from scipy.stats import binom
+
+# --- Helper Functions ----------------------------------------------------------------
+def mcnemar_test(b: int, c: int) -> float:
+    """
+    Perform McNemar's test using exact binomial test.
+    
+    Args:
+        b: Number of cases where model 1 correct, model 2 wrong
+        c: Number of cases where model 1 wrong, model 2 correct
+    
+    Returns:
+        p-value (two-tailed)
+    """
+    n = b + c
+    if n == 0:
+        return 1.0  # No discordant pairs, models are identical
+    
+    # Exact binomial test (two-tailed)
+    # Under null hypothesis, b and c should be equally likely (p=0.5)
+    k = min(b, c)
+    p_value = 2 * binom.cdf(k, n, 0.5)
+    
+    return min(p_value, 1.0)  # Cap at 1.0 for numerical stability
+
 
 # --- Configuration -----------------------------------------------------------------
 # Get project root directory (works whether script is run from scripts/ or root)
@@ -79,9 +106,20 @@ HISTORICAL_HEADLINES_PATH = PROJECT_ROOT / "data" / "processed" / "wsj_apple_pro
 # Fallback to sample data if ProQuest file doesn't exist yet
 HISTORICAL_HEADLINES_FALLBACK = PROJECT_ROOT / "data" / "raw" / "historical_headlines.csv"
 HISTORICAL_SENTIMENT_OUTPUT = PROJECT_ROOT / "results" / "historical_sentiment_analysis.csv"
-AGGREGATED_DATA_OUTPUT = PROJECT_ROOT / "results" / "sentiment_stock_dataset.csv"
 MODEL_RESULTS_PATH = PROJECT_ROOT / "results" / "model_results.md"
 CONFUSION_MATRIX_PATH = PROJECT_ROOT / "results" / "confusion_matrix.png"
+
+# Experiment 1: Next-Day prediction outputs (renamed for clarity alongside Experiment 2)
+AGGREGATED_DATA_OUTPUT = PROJECT_ROOT / "results" / "sentiment_stock_dataset_nextday.csv"
+MODEL_COMPARISON_RESULTS = PROJECT_ROOT / "results" / "model_comparison_nextday.md"
+CONFUSION_MATRIX_TECH = PROJECT_ROOT / "results" / "confusion_matrix_technical_nextday.png"
+CONFUSION_MATRIX_SENT = PROJECT_ROOT / "results" / "confusion_matrix_sentiment_nextday.png"
+CONFUSION_MATRIX_COMBINED = PROJECT_ROOT / "results" / "confusion_matrix_combined_nextday.png"
+
+# Experiment 2: Intraday prediction outputs
+INTRADAY_DATA_OUTPUT = PROJECT_ROOT / "results" / "sentiment_stock_dataset_intraday.csv"
+INTRADAY_COMPARISON_RESULTS = PROJECT_ROOT / "results" / "model_comparison_intraday.md"
+INTRADAY_CONFUSION_MATRIX = PROJECT_ROOT / "results" / "confusion_matrix_intraday.png"
 
 # Output label order produced by the FinBERT model.
 # NOTE: FinBERT uses [neutral, positive, negative] order, not [positive, negative, neutral]!
@@ -101,6 +139,50 @@ def fetch_stock_data(symbol: str, start: str, end: str) -> pd.DataFrame:
     if isinstance(data.columns, pd.MultiIndex):
         data.columns = [col[0] if isinstance(col, tuple) else col for col in data.columns.to_list()]
     return data
+
+
+def calculate_technical_indicators(stock_data: pd.DataFrame) -> pd.DataFrame:
+    """Calculate momentum-based technical indicators from OHLCV stock data.
+    
+    Model B - Momentum Features (3 indicators for short-term prediction):
+    - return_1d: Today's price change % (captures immediate momentum)
+    - price_vs_sma20: Position relative to 20-day MA (overbought/oversold)
+    - rsi_change: Change in RSI from yesterday (momentum acceleration)
+    
+    These features focus on SHORT-TERM dynamics relevant for next-day prediction.
+    """
+    df = stock_data.copy()
+    
+    # Calculate intermediate values needed for momentum features
+    # SMA_20 for relative position
+    df['SMA_20'] = df['Close'].rolling(window=20).mean()
+    
+    # RSI_14 for momentum change — uses Wilder's smoothed moving average (EMA with
+    # alpha=1/14), which is the standard definition (Wilder, 1978).  A plain
+    # rolling(14).mean() would give different values from any financial data terminal.
+    delta = df['Close'].diff()
+    gain = (delta.where(delta > 0, 0)).ewm(alpha=1/14, min_periods=14, adjust=False).mean()
+    loss = (-delta.where(delta < 0, 0)).ewm(alpha=1/14, min_periods=14, adjust=False).mean()
+    rs = gain / loss
+    df['RSI_14'] = 100 - (100 / (1 + rs))
+    
+    # === MOMENTUM FEATURES (Model B) ===
+    
+    # 1. return_1d: Today's price change % (most important for next-day prediction)
+    df['return_1d'] = df['Close'].pct_change()
+    
+    # 2. price_vs_sma20: Position relative to 20-day moving average
+    # Positive = above trend (bullish), Negative = below trend (bearish)
+    df['price_vs_sma20'] = (df['Close'] - df['SMA_20']) / df['SMA_20']
+    
+    # 3. rsi_change: Change in RSI from yesterday (momentum acceleration)
+    df['rsi_change'] = df['RSI_14'].diff()
+    
+    # Count NaN rows (mainly from the 20-day rolling window)
+    nan_count = df[['return_1d', 'price_vs_sma20', 'rsi_change']].isna().any(axis=1).sum()
+    print(f"Momentum indicators calculated. NaN rows from rolling windows: {nan_count}")
+    
+    return df
 
 
 def extract_headline_date(headline_tag, fallback_date: pd.Timestamp) -> pd.Timestamp:
@@ -316,13 +398,25 @@ def analyze_headlines(
                 "neutral": round(sentiment_scores["neutral"], 4),
             }
         )
-        print(
-            f"{index}. {headline_date.date()} - {headline_text}\n"
-            f"   Sentiment: {sentiment_scores['sentiment']} "
-            f"(Pos: {sentiment_scores['positive']:.2f}, "
-            f"Neg: {sentiment_scores['negative']:.2f}, "
-            f"Neu: {sentiment_scores['neutral']:.2f})"
-        )
+        # Handle encoding issues on Windows console
+        try:
+            print(
+                f"{index}. {headline_date.date()} - {headline_text}\n"
+                f"   Sentiment: {sentiment_scores['sentiment']} "
+                f"(Pos: {sentiment_scores['positive']:.2f}, "
+                f"Neg: {sentiment_scores['negative']:.2f}, "
+                f"Neu: {sentiment_scores['neutral']:.2f})"
+            )
+        except UnicodeEncodeError:
+            # Fallback for problematic characters
+            safe_headline = headline_text.encode('ascii', errors='replace').decode('ascii')
+            print(
+                f"{index}. {headline_date.date()} - {safe_headline}\n"
+                f"   Sentiment: {sentiment_scores['sentiment']} "
+                f"(Pos: {sentiment_scores['positive']:.2f}, "
+                f"Neg: {sentiment_scores['negative']:.2f}, "
+                f"Neu: {sentiment_scores['neutral']:.2f})"
+            )
 
     return pd.DataFrame(records)
 
@@ -365,7 +459,10 @@ def aggregate_daily_sentiment(sentiment_frames: Sequence[pd.DataFrame]) -> pd.Da
 
 
 def merge_sentiment_with_stock(daily_sentiment: pd.DataFrame, stock_data: pd.DataFrame) -> pd.DataFrame:
-    """Align daily sentiment with stock closes and create a movement label."""
+    """Align daily sentiment with stock data and create movement label.
+    
+    This function now also calculates technical indicators and includes them in the merged dataset.
+    """
     if daily_sentiment is None or daily_sentiment.empty:
         print("Daily sentiment frame is empty; skipping merge with stock data.")
         return pd.DataFrame()
@@ -377,6 +474,10 @@ def merge_sentiment_with_stock(daily_sentiment: pd.DataFrame, stock_data: pd.Dat
     stock.index = pd.to_datetime(stock.index)
     stock = stock.sort_index()
 
+    # Calculate technical indicators BEFORE merging
+    print("\nCalculating technical indicators...")
+    stock = calculate_technical_indicators(stock)
+
     close_col = "Close" if "Close" in stock.columns else "Adj Close" if "Adj Close" in stock.columns else None
     if close_col is None:
         raise ValueError("Stock dataset is missing both 'Close' and 'Adj Close' columns.")
@@ -386,7 +487,18 @@ def merge_sentiment_with_stock(daily_sentiment: pd.DataFrame, stock_data: pd.Dat
     stock_reset[date_col] = pd.to_datetime(stock_reset[date_col], errors="coerce")
     stock_reset = stock_reset.dropna(subset=[date_col])
     stock_reset["date"] = stock_reset[date_col].dt.normalize()
-    stock_df = stock_reset[["date", close_col]].rename(columns={close_col: "close"})
+    
+    # Include close price AND momentum-based technical indicators in merge
+    columns_to_keep = ["date", close_col, "return_1d", "price_vs_sma20", "rsi_change"]
+    stock_df = stock_reset[columns_to_keep].rename(columns={close_col: "close"})
+
+    # Compute next_close on the FULL stock series (every consecutive trading day)
+    # BEFORE the inner join with sentiment.  If this were done after the join, the
+    # shift(-1) would land on the next *news* day rather than the next *trading* day,
+    # turning a supposed 1-day prediction into a multi-day prediction whenever there
+    # are gaps in WSJ coverage.
+    stock_df = stock_df.copy()
+    stock_df["next_close"] = stock_df["close"].shift(-1)
 
     merged = pd.merge(daily_sentiment, stock_df, on="date", how="inner")
     if merged.empty:
@@ -394,154 +506,822 @@ def merge_sentiment_with_stock(daily_sentiment: pd.DataFrame, stock_data: pd.Dat
         return merged
 
     merged = merged.sort_values("date").reset_index(drop=True)
-    merged["next_close"] = merged["close"].shift(-1)
-    merged = merged.dropna(subset=["next_close"]).copy()
-    merged["stock_move"] = (merged["next_close"] > merged["close"]).astype(int)
 
-    print("\nMerged sentiment with stock data. Preview:")
+    # Drop only the last trading day of the series (next_close is NaN there).
+    merged = merged.dropna(subset=["next_close"]).copy()
+    merged["stock_move_nextday"] = (merged["next_close"] > merged["close"]).astype(int)
+
+    print("\nMerged sentiment with stock data (including technical indicators). Preview:")
     print(merged.head())
+    print(f"\nDataset shape: {merged.shape}")
+    print(f"Columns: {list(merged.columns)}")
+    print(f"\nTarget distribution:")
+    print(f"  Next-day prediction: {merged['stock_move_nextday'].value_counts().to_dict()}")
+    return merged
+
+
+def merge_sentiment_with_stock_intraday(daily_sentiment: pd.DataFrame, stock_data: pd.DataFrame) -> pd.DataFrame:
+    """Build the Experiment 2 dataset for intraday prediction.
+
+    Target variable: stock_move_intraday = 1 if Close(t) > Open(t), else 0.
+
+    Feature timing:
+      - Sentiment features: same-day (day t) — treated as pre-market information.
+      - Technical indicators: lagged by one trading day (computed from Close(t-1) and
+        earlier), so that only information available before market open on day t is used.
+
+    Critically, the lag is applied on the *full* stock dataframe (every consecutive
+    trading day) BEFORE merging with sentiment.  If the shift were done after the inner
+    join, gaps in WSJ coverage would cause the lag to skip actual trading days — e.g.
+    Jan 7's lagged value would incorrectly reflect Jan 5 instead of Jan 6.
+    """
+    if daily_sentiment is None or daily_sentiment.empty:
+        print("Daily sentiment frame is empty; skipping intraday merge.")
+        return pd.DataFrame()
+    if stock_data is None or stock_data.empty:
+        print("Stock data frame is empty; skipping intraday merge.")
+        return pd.DataFrame()
+
+    stock = stock_data.copy()
+    stock.index = pd.to_datetime(stock.index)
+    stock = stock.sort_index()
+
+    # Step 1 — calculate technical indicators on full consecutive trading-day series.
+    print("\nCalculating technical indicators for intraday experiment...")
+    stock = calculate_technical_indicators(stock)
+
+    # Identify Close and Open columns.
+    close_col = "Close" if "Close" in stock.columns else "Adj Close" if "Adj Close" in stock.columns else None
+    if close_col is None:
+        raise ValueError("Stock dataset is missing both 'Close' and 'Adj Close' columns.")
+    open_col = "Open" if "Open" in stock.columns else None
+    if open_col is None:
+        raise ValueError("Stock dataset is missing 'Open' column (required for intraday target).")
+
+    # Step 2 — compute at-open technical features on full consecutive trading-day series.
+    #
+    #   overnight_gap(t)  = (Open(t) - Close(t-1)) / Close(t-1)
+    #       Captures the pre-market gap; directly known at 9:30 AM.
+    #
+    #   open_vs_sma20(t)  = (Open(t) - SMA_20(t-1)) / SMA_20(t-1)
+    #       Compares today's open to the SMA built from prior closes (fully known at open).
+    #       This is what intraday traders observe when markets open.
+    #
+    #   rsi_change_lag1(t) = RSI_14(t-1) - RSI_14(t-2)
+    #       RSI is computed from closing prices; the most current reading at market open
+    #       is yesterday's RSI, so we keep the lag-1 shift here.
+    close_prev = stock["Close"].shift(1)   # Close(t-1)
+    sma20_prev = stock["SMA_20"].shift(1)  # SMA_20(t-1) — known before market opens
+
+    stock["overnight_gap"]  = (stock["Open"] - close_prev) / close_prev
+    stock["open_vs_sma20"]  = (stock["Open"] - sma20_prev) / sma20_prev
+    stock["rsi_change_lag1"] = stock["rsi_change"].shift(1)
+
+    # Step 3 — flatten the index and build a clean date column.
+    stock_reset = stock.reset_index()
+    date_col = stock_reset.columns[0]
+    stock_reset[date_col] = pd.to_datetime(stock_reset[date_col], errors="coerce")
+    stock_reset = stock_reset.dropna(subset=[date_col])
+    stock_reset["date"] = stock_reset[date_col].dt.normalize()
+
+    # Step 4 — extract Open, Close, and at-open technical features into a flat frame.
+    columns_to_keep = [
+        "date",
+        open_col,
+        close_col,
+        "overnight_gap",
+        "open_vs_sma20",
+        "rsi_change_lag1",
+    ]
+    stock_df = stock_reset[columns_to_keep].rename(columns={
+        open_col: "open",
+        close_col: "close",
+    })
+
+    # Step 5 — inner join: sentiment(t) matched to same trading day(t).
+    #   No further shifting needed — lags are already aligned to t-1.
+    merged = pd.merge(daily_sentiment, stock_df, on="date", how="inner")
+    if merged.empty:
+        print("Daily sentiment dates do not overlap with stock data for intraday experiment.")
+        return merged
+
+    merged = merged.sort_values("date").reset_index(drop=True)
+
+    # Step 6 — create intraday target: did the stock close above its open?
+    merged["stock_move_intraday"] = (merged["close"] > merged["open"]).astype(int)
+
+    # Step 7 — drop rows where lagged technicals are NaN.
+    #   This only affects the first ~20 rows of the full stock series (rolling window
+    #   startup), which almost certainly fall outside the WSJ-coverage window anyway.
+    initial_count = len(merged)
+    merged = merged.dropna(
+        subset=["overnight_gap", "open_vs_sma20", "rsi_change_lag1"]
+    ).copy()
+    dropped = initial_count - len(merged)
+    if dropped > 0:
+        print(f"  Dropped {dropped} rows with missing lagged technical indicators.")
+
+    print("\nIntraday dataset created. Preview:")
+    print(merged.head())
+    print(f"\nDataset shape: {merged.shape}")
+    print(f"Columns: {list(merged.columns)}")
+    print(f"\nTarget distribution:")
+    print(f"  Intraday prediction: {merged['stock_move_intraday'].value_counts().to_dict()}")
     return merged
 
 
 # --- Modeling ------------------------------------------------------------------------
-def train_baseline_model(
+def evaluate_models_with_cv(
+    dataset: pd.DataFrame,
+    target_column: str = 'stock_move_nextday',
+    prediction_type: str = 'Next-Day',
+    n_splits: int = 5,
+    technical_features: List[str] = None,
+) -> Dict:
+    """Perform time-series cross-validation to get robust performance estimates.
+    
+    Uses TimeSeriesSplit to maintain temporal ordering while evaluating models.
+    Returns mean and std of metrics across all folds.
+    
+    Args:
+        dataset: DataFrame with features and target
+        target_column: Column name for target variable
+        prediction_type: Description for logging
+        n_splits: Number of cross-validation folds
+        technical_features: List of technical feature column names to use.
+            Defaults to ['return_1d', 'price_vs_sma20', 'rsi_change'] (Experiment 1).
+            Pass lagged names for Experiment 2 intraday prediction.
+        
+    Returns:
+        Dictionary with CV results for each model (mean ± std)
+    """
+    print(f"\n{'='*80}")
+    print(f"CROSS-VALIDATION: {prediction_type} Prediction ({n_splits} folds)")
+    print(f"{'='*80}")
+    
+    # Define feature sets
+    sentiment_features = ['avg_positive', 'avg_negative', 'avg_neutral']
+    if technical_features is None:
+        # Default: Experiment 1 non-lagged feature names
+        technical_features = ['return_1d', 'price_vs_sma20', 'rsi_change']
+    
+    print(f"Technical features: {technical_features}")
+    print(f"Sentiment features: {sentiment_features}")
+    
+    # Check required columns
+    required_columns = set(sentiment_features + technical_features + [target_column])
+    missing_columns = required_columns.difference(dataset.columns)
+    if missing_columns:
+        raise ValueError(f"Dataset is missing required columns: {missing_columns}")
+    
+    # Drop rows with NaN
+    dataset_clean = dataset.dropna(subset=technical_features + sentiment_features).copy()
+    print(f"\nDataset size: {len(dataset_clean)} samples (after dropping NaN)")
+    
+    if len(dataset_clean) < 20:
+        print("Not enough data for cross-validation. Skipping.")
+        return {}
+    
+    # Prepare feature matrices
+    X_tech = dataset_clean[technical_features].values
+    X_sent = dataset_clean[sentiment_features].values
+    X_combined = dataset_clean[technical_features + sentiment_features].values
+    y = dataset_clean[target_column].values
+    
+    # Initialize TimeSeriesSplit
+    tscv = TimeSeriesSplit(n_splits=n_splits)
+    
+    # Store results for each model
+    cv_results = {
+        'Technical Only': {'accuracy': [], 'precision': [], 'recall': [], 'f1': []},
+        'Sentiment Only': {'accuracy': [], 'precision': [], 'recall': [], 'f1': []},
+        'Technical + Sentiment': {'accuracy': [], 'precision': [], 'recall': [], 'f1': []}
+    }
+    
+    # Run cross-validation
+    fold_num = 1
+    for train_idx, test_idx in tscv.split(X_tech):
+        print(f"\nFold {fold_num}/{n_splits}: Train size={len(train_idx)}, Test size={len(test_idx)}")
+        
+        # Split data for this fold
+        y_train, y_test = y[train_idx], y[test_idx]
+        
+        # Check if we have both classes
+        if len(np.unique(y_train)) < 2 or len(np.unique(y_test)) < 2:
+            print(f"  Fold {fold_num} skipped: insufficient class diversity")
+            fold_num += 1
+            continue
+        
+        # Train and evaluate each model
+        models_config = [
+            ('Technical Only', X_tech[train_idx], X_tech[test_idx]),
+            ('Sentiment Only', X_sent[train_idx], X_sent[test_idx]),
+            ('Technical + Sentiment', X_combined[train_idx], X_combined[test_idx])
+        ]
+        
+        for name, X_train_raw, X_test_raw in models_config:
+            # Scale features
+            scaler = StandardScaler()
+            X_train = scaler.fit_transform(X_train_raw)
+            X_test = scaler.transform(X_test_raw)
+            
+            # Train model — class_weight='balanced' prevents the classifier from
+            # collapsing to always predicting the majority class when signal is weak.
+            model = LogisticRegression(max_iter=1000, random_state=42, class_weight='balanced')
+            model.fit(X_train, y_train)
+            y_pred = model.predict(X_test)
+            
+            # Calculate metrics
+            accuracy = accuracy_score(y_test, y_pred)
+            precision, recall, f1, _ = precision_recall_fscore_support(
+                y_test, y_pred, average='binary', zero_division=0
+            )
+            
+            # Store results
+            cv_results[name]['accuracy'].append(accuracy)
+            cv_results[name]['precision'].append(precision)
+            cv_results[name]['recall'].append(recall)
+            cv_results[name]['f1'].append(f1)
+        
+        fold_num += 1
+    
+    # Calculate summary statistics
+    print(f"\n{'='*80}")
+    print(f"CROSS-VALIDATION RESULTS SUMMARY")
+    print(f"{'='*80}")
+    
+    summary = {}
+    for model_name in ['Technical Only', 'Sentiment Only', 'Technical + Sentiment']:
+        results = cv_results[model_name]
+        
+        if len(results['accuracy']) == 0:
+            print(f"\n{model_name}: No valid folds")
+            continue
+        
+        summary[model_name] = {
+            'accuracy_mean': np.mean(results['accuracy']),
+            'accuracy_std': np.std(results['accuracy']),
+            'precision_mean': np.mean(results['precision']),
+            'precision_std': np.std(results['precision']),
+            'recall_mean': np.mean(results['recall']),
+            'recall_std': np.std(results['recall']),
+            'f1_mean': np.mean(results['f1']),
+            'f1_std': np.std(results['f1']),
+            'n_folds': len(results['accuracy'])
+        }
+        
+        s = summary[model_name]
+        print(f"\n{model_name}:")
+        print(f"  Accuracy:  {s['accuracy_mean']:.4f} ± {s['accuracy_std']:.4f}")
+        print(f"  Precision: {s['precision_mean']:.4f} ± {s['precision_std']:.4f}")
+        print(f"  Recall:    {s['recall_mean']:.4f} ± {s['recall_std']:.4f}")
+        print(f"  F1-Score:  {s['f1_mean']:.4f} ± {s['f1_std']:.4f}")
+        print(f"  (based on {s['n_folds']} folds)")
+    
+    return summary
+
+
+def train_comparison_models(
     dataset: pd.DataFrame,
     results_path: Path,
     confusion_matrix_path: Path,
+    target_column: str = 'stock_move_nextday',
+    prediction_type: str = 'Next-Day',
+    cv_results: Dict = None,
+    technical_features: List[str] = None,
+    cm_suffix: str = 'nextday',
 ) -> None:
-    """Train and evaluate a logistic regression baseline on the sentiment features."""
+    """Train and compare three models: Technical-only, Sentiment-only, Technical+Sentiment.
+    
+    Uses time-based split for realistic evaluation (train on first 70%, test on last 30%).
+    Generates comparison results and separate confusion matrices for each model.
+    
+    Args:
+        dataset: DataFrame with features and target
+        results_path: Path to save results markdown
+        confusion_matrix_path: Path to save confusion matrices (not used, we generate separate ones)
+        target_column: Column name for target variable
+        prediction_type: Description for results (e.g. 'Next-Day', 'Intraday')
+        cv_results: Optional dict with cross-validation results to include in report
+        technical_features: List of technical feature column names to use.
+            Defaults to ['return_1d', 'price_vs_sma20', 'rsi_change'] (Experiment 1).
+            Pass lagged names for Experiment 2 intraday prediction.
+        cm_suffix: Suffix appended to confusion matrix filenames to distinguish experiments
+            (e.g. 'nextday' → confusion_matrix_technical_nextday.png).
+    """
     if dataset is None or dataset.empty:
-        print("Aggregated dataset is empty; skipping baseline model training.")
+        print("Aggregated dataset is empty; skipping comparison model training.")
         return
 
-    required_columns = {"avg_positive", "avg_negative", "avg_neutral", "stock_move"}
+    # Define feature sets
+    sentiment_features = ['avg_positive', 'avg_negative', 'avg_neutral']
+    if technical_features is None:
+        # Default: Experiment 1 non-lagged feature names
+        technical_features = ['return_1d', 'price_vs_sma20', 'rsi_change']
+    
+    # Check required columns
+    required_columns = set(sentiment_features + technical_features + [target_column])
     missing_columns = required_columns.difference(dataset.columns)
     if missing_columns:
-        raise ValueError(f"Aggregated dataset is missing required columns: {missing_columns}")
-
-    label_counts = dataset["stock_move"].value_counts()
-    if label_counts.size < 2:
-        print("Baseline model training skipped: dataset contains only one class.")
+        raise ValueError(f"Dataset is missing required columns: {missing_columns}")
+    
+    # Drop rows with NaN (from rolling windows in technical indicators)
+    print(f"\nDataset before dropping NaN: {len(dataset)} rows")
+    dataset_clean = dataset.dropna(subset=technical_features + sentiment_features).copy()
+    print(f"Dataset after dropping NaN: {len(dataset_clean)} rows")
+    
+    if len(dataset_clean) < 10:
+        print("Not enough data after cleaning. Skipping model training.")
         return
-
-    features = dataset[["avg_positive", "avg_negative", "avg_neutral"]]
-    labels = dataset["stock_move"]
-
-    # A stratified split keeps both classes represented when we have enough samples.
-    stratify_labels = labels if label_counts.min() >= 2 else None
-    test_size = 0.3 if len(dataset) >= 10 else 0.4
-
-    X_train, X_test, y_train, y_test = train_test_split(
-        features,
-        labels,
-        test_size=test_size,
-        random_state=42,
-        stratify=stratify_labels,
-    )
-
-    if y_train.nunique() < 2:
-        print("Training set contains a single class after split; skipping baseline model.")
+    
+    # TIME-BASED SPLIT (not random) - more realistic for time series
+    split_idx = int(len(dataset_clean) * 0.7)
+    train_data = dataset_clean.iloc[:split_idx]
+    test_data = dataset_clean.iloc[split_idx:]
+    
+    print(f"\nTime-based split:")
+    print(f"  Train period: {train_data['date'].min()} to {train_data['date'].max()}")
+    print(f"  Test period: {test_data['date'].min()} to {test_data['date'].max()}")
+    print(f"  Train size: {len(train_data)}, Test size: {len(test_data)}")
+    
+    y_train = train_data[target_column]
+    y_test = test_data[target_column]
+    
+    # Verify we have both classes in train and test
+    if y_train.nunique() < 2 or y_test.nunique() < 2:
+        print("Training or test set contains only one class. Skipping model training.")
         return
-
-    model = LogisticRegression(max_iter=1000)
-    model.fit(X_train, y_train)
-
-    y_pred = model.predict(X_test)
-
-    accuracy = accuracy_score(y_test, y_pred)
-    precision, recall, f1, _ = precision_recall_fscore_support(
-        y_test,
-        y_pred,
-        average="binary",
-        zero_division=0,
-    )
-    report = classification_report(
-        y_test,
-        y_pred,
-        target_names=["Down/Flat", "Up"],
-        zero_division=0,
-    )
-    cm = confusion_matrix(y_test, y_pred, labels=[0, 1])
-
-    results_lines = [
-        "# Baseline Logistic Regression Results",
-        "",
-        f"- Train samples: {len(X_train)}",
-        f"- Test samples: {len(X_test)}",
-        "- Feature columns: avg_positive, avg_negative, avg_neutral",
-        f"- Accuracy: {accuracy:.4f}",
-        f"- Precision (Up): {precision:.4f}",
-        f"- Recall (Up): {recall:.4f}",
-        f"- F1-score (Up): {f1:.4f}",
-        "",
-        "## Classification Report",
-        "```",
-        report.strip(),
-        "```",
-        "",
-        f"Confusion matrix saved to `{confusion_matrix_path.name}`.",
+    
+    # Prepare three feature sets (unscaled)
+    X_train_tech_raw = train_data[technical_features]
+    X_test_tech_raw = test_data[technical_features]
+    
+    X_train_sent_raw = train_data[sentiment_features]
+    X_test_sent_raw = test_data[sentiment_features]
+    
+    X_train_combined_raw = train_data[technical_features + sentiment_features]
+    X_test_combined_raw = test_data[technical_features + sentiment_features]
+    
+    # Apply StandardScaler to each feature set independently
+    print("\nApplying StandardScaler to normalize features...")
+    
+    # Scale technical features
+    scaler_tech = StandardScaler()
+    X_train_tech = scaler_tech.fit_transform(X_train_tech_raw)
+    X_test_tech = scaler_tech.transform(X_test_tech_raw)
+    
+    # Scale sentiment features
+    scaler_sent = StandardScaler()
+    X_train_sent = scaler_sent.fit_transform(X_train_sent_raw)
+    X_test_sent = scaler_sent.transform(X_test_sent_raw)
+    
+    # Scale combined features
+    scaler_combined = StandardScaler()
+    X_train_combined = scaler_combined.fit_transform(X_train_combined_raw)
+    X_test_combined = scaler_combined.transform(X_test_combined_raw)
+    
+    print(f"  Technical features scaled: mean={X_train_tech.mean():.4f}, std={X_train_tech.std():.4f}")
+    print(f"  Sentiment features scaled: mean={X_train_sent.mean():.4f}, std={X_train_sent.std():.4f}")
+    print(f"  Combined features scaled: mean={X_train_combined.mean():.4f}, std={X_train_combined.std():.4f}")
+    
+    # Train all three models and collect metrics
+    results = {}
+    confusion_matrices = {}
+    classification_reports = {}
+    predictions = {}  # Store predictions for statistical testing
+    
+    # Create confusion matrix paths — suffix distinguishes experiments
+    cm_tech    = PROJECT_ROOT / "results" / f"confusion_matrix_technical_{cm_suffix}.png"
+    cm_sent    = PROJECT_ROOT / "results" / f"confusion_matrix_sentiment_{cm_suffix}.png"
+    cm_combined = PROJECT_ROOT / "results" / f"confusion_matrix_combined_{cm_suffix}.png"
+    
+    models_to_train = [
+        ('Technical Only', X_train_tech, X_test_tech, technical_features, cm_tech),
+        ('Sentiment Only', X_train_sent, X_test_sent, sentiment_features, cm_sent),
+        ('Technical + Sentiment', X_train_combined, X_test_combined, technical_features + sentiment_features, cm_combined)
     ]
+    
+    for name, X_train, X_test, feature_names, cm_path in models_to_train:
+        print(f"\n{'='*60}")
+        print(f"Training: {name}")
+        print(f"Features: {feature_names}")
+        print(f"{'='*60}")
+        
+        # class_weight='balanced' prevents the classifier from collapsing to always
+        # predicting the majority class when signal is weak.
+        model = LogisticRegression(max_iter=1000, random_state=42, class_weight='balanced')
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+
+        # Store predictions for statistical testing
+        predictions[name] = y_pred
+        
+        # Calculate metrics
+        accuracy = accuracy_score(y_test, y_pred)
+        precision, recall, f1, _ = precision_recall_fscore_support(
+            y_test, y_pred, average='binary', zero_division=0
+        )
+        cm = confusion_matrix(y_test, y_pred, labels=[0, 1])
+        report = classification_report(
+            y_test, y_pred, target_names=['Down/Flat', 'Up'], zero_division=0
+        )
+        
+        results[name] = {
+            'accuracy': accuracy,
+            'precision': precision,
+            'recall': recall,
+            'f1': f1,
+            'train_size': len(X_train),
+            'test_size': len(X_test)
+        }
+        confusion_matrices[name] = cm
+        classification_reports[name] = report
+        
+        print(f"\nResults for {name}:")
+        print(f"  Accuracy: {accuracy:.4f}")
+        print(f"  Precision (Up): {precision:.4f}")
+        print(f"  Recall (Up): {recall:.4f}")
+        print(f"  F1-score (Up): {f1:.4f}")
+        
+        # Save individual confusion matrix
+        fig, ax = plt.subplots(figsize=(4.5, 4))
+        disp = ConfusionMatrixDisplay(
+            confusion_matrix=cm,
+            display_labels=['Down/Flat', 'Up']
+        )
+        disp.plot(ax=ax, cmap='Blues', colorbar=False, values_format='d')
+        ax.set_title(f'{name}\nConfusion Matrix')
+        plt.tight_layout()
+        cm_path.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(cm_path, dpi=300)
+        plt.close(fig)
+        print(f"  Confusion matrix saved to '{cm_path}'")
+    
+    # Perform statistical significance testing (McNemar's test)
+    print(f"\n{'='*60}")
+    print("STATISTICAL SIGNIFICANCE TESTING")
+    print(f"{'='*60}")
+    
+    mcnemar_results = {}
+    
+    # Test 1: Technical vs Combined
+    y_tech = predictions['Technical Only']
+    y_comb = predictions['Technical + Sentiment']
+    
+    # Create contingency table for McNemar's test
+    # [both_correct, tech_correct_comb_wrong]
+    # [tech_wrong_comb_correct, both_wrong]
+    tech_correct = (y_tech == y_test)
+    comb_correct = (y_comb == y_test)
+    
+    both_correct = np.sum(tech_correct & comb_correct)
+    tech_right_comb_wrong = np.sum(tech_correct & ~comb_correct)
+    tech_wrong_comb_right = np.sum(~tech_correct & comb_correct)
+    both_wrong = np.sum(~tech_correct & ~comb_correct)
+    
+    # Only run test if we have discordant pairs
+    if tech_right_comb_wrong + tech_wrong_comb_right > 0:
+        p_value_tech = mcnemar_test(tech_right_comb_wrong, tech_wrong_comb_right)
+        mcnemar_results['Technical vs Combined'] = {
+            'p_value': p_value_tech,
+            'tech_right_comb_wrong': tech_right_comb_wrong,
+            'tech_wrong_comb_right': tech_wrong_comb_right
+        }
+        print(f"\nTechnical Only vs Combined:")
+        print(f"  Cases where Technical correct, Combined wrong: {tech_right_comb_wrong}")
+        print(f"  Cases where Technical wrong, Combined correct: {tech_wrong_comb_right}")
+        print(f"  p-value: {p_value_tech:.4f}")
+        if p_value_tech < 0.05:
+            print(f"  Result: Statistically significant difference (p < 0.05) ✓")
+        else:
+            print(f"  Result: No significant difference (p >= 0.05)")
+    else:
+        print(f"\nTechnical Only vs Combined: Identical predictions")
+        mcnemar_results['Technical vs Combined'] = None
+    
+    # Test 2: Sentiment vs Combined
+    y_sent = predictions['Sentiment Only']
+    
+    sent_correct = (y_sent == y_test)
+    
+    both_correct_sent = np.sum(sent_correct & comb_correct)
+    sent_right_comb_wrong = np.sum(sent_correct & ~comb_correct)
+    sent_wrong_comb_right = np.sum(~sent_correct & comb_correct)
+    both_wrong_sent = np.sum(~sent_correct & ~comb_correct)
+    
+    if sent_right_comb_wrong + sent_wrong_comb_right > 0:
+        p_value_sent = mcnemar_test(sent_right_comb_wrong, sent_wrong_comb_right)
+        mcnemar_results['Sentiment vs Combined'] = {
+            'p_value': p_value_sent,
+            'sent_right_comb_wrong': sent_right_comb_wrong,
+            'sent_wrong_comb_right': sent_wrong_comb_right
+        }
+        print(f"\nSentiment Only vs Combined:")
+        print(f"  Cases where Sentiment correct, Combined wrong: {sent_right_comb_wrong}")
+        print(f"  Cases where Sentiment wrong, Combined correct: {sent_wrong_comb_right}")
+        print(f"  p-value: {p_value_sent:.4f}")
+        if p_value_sent < 0.05:
+            print(f"  Result: Statistically significant difference (p < 0.05) ✓")
+        else:
+            print(f"  Result: No significant difference (p >= 0.05)")
+    else:
+        print(f"\nSentiment Only vs Combined: Identical predictions")
+        mcnemar_results['Sentiment vs Combined'] = None
+
+    # Test 3: Technical Only vs Sentiment Only (the core EMH head-to-head comparison)
+    tech_right_sent_wrong = np.sum(tech_correct & ~sent_correct)
+    tech_wrong_sent_right = np.sum(~tech_correct & sent_correct)
+
+    if tech_right_sent_wrong + tech_wrong_sent_right > 0:
+        p_value_tech_sent = mcnemar_test(tech_right_sent_wrong, tech_wrong_sent_right)
+        mcnemar_results['Technical vs Sentiment'] = {
+            'p_value': p_value_tech_sent,
+            'tech_right_sent_wrong': tech_right_sent_wrong,
+            'tech_wrong_sent_right': tech_wrong_sent_right
+        }
+        print(f"\nTechnical Only vs Sentiment Only:")
+        print(f"  Cases where Technical correct, Sentiment wrong: {tech_right_sent_wrong}")
+        print(f"  Cases where Technical wrong, Sentiment correct: {tech_wrong_sent_right}")
+        print(f"  p-value: {p_value_tech_sent:.4f}")
+        if p_value_tech_sent < 0.05:
+            print(f"  Result: Statistically significant difference (p < 0.05) ✓")
+        else:
+            print(f"  Result: No significant difference (p >= 0.05)")
+    else:
+        print(f"\nTechnical Only vs Sentiment Only: Identical predictions")
+        mcnemar_results['Technical vs Sentiment'] = None
+
+    # Generate comprehensive comparison results markdown
+    results_lines = [
+        f"# Model Comparison: Technical vs Sentiment vs Combined ({prediction_type} Prediction)",
+        "",
+        "## Experimental Design",
+        "",
+        f"- **Prediction Target**: {prediction_type} price movement",
+        f"- **Split Method**: Time-based (first 70% train, last 30% test)",
+        f"- **Feature Scaling**: StandardScaler (mean=0, std=1) applied to all features",
+        f"- **Train Period**: {train_data['date'].min().strftime('%Y-%m-%d')} to {train_data['date'].max().strftime('%Y-%m-%d')}",
+        f"- **Test Period**: {test_data['date'].min().strftime('%Y-%m-%d')} to {test_data['date'].max().strftime('%Y-%m-%d')}",
+        f"- **Train Samples**: {len(train_data)}",
+        f"- **Test Samples**: {len(test_data)}",
+        f"- **Technical Features**: {', '.join(technical_features)}",
+        f"- **Sentiment Features**: {', '.join(sentiment_features)}",
+        "",
+        "## Results Summary",
+        "",
+        "| Model | Accuracy | Precision (Up) | Recall (Up) | F1-Score (Up) | Train Size | Test Size |",
+        "|-------|----------|----------------|-------------|---------------|------------|-----------|",
+    ]
+    
+    for name in ['Technical Only', 'Sentiment Only', 'Technical + Sentiment']:
+        r = results[name]
+        results_lines.append(
+            f"| {name} | {r['accuracy']*100:.2f}% | {r['precision']*100:.2f}% | "
+            f"{r['recall']*100:.2f}% | {r['f1']*100:.2f}% | {r['train_size']} | {r['test_size']} |"
+        )
+    
+    # Add cross-validation results if provided
+    if cv_results and len(cv_results) > 0:
+        results_lines.extend([
+            "",
+            "## Cross-Validation Results",
+            "",
+            "**5-Fold Time-Series Cross-Validation** (mean ± std across folds):",
+            "",
+            "| Model | Accuracy | Precision (Up) | Recall (Up) | F1-Score (Up) | Folds |",
+            "|-------|----------|----------------|-------------|---------------|-------|",
+        ])
+        
+        for name in ['Technical Only', 'Sentiment Only', 'Technical + Sentiment']:
+            if name in cv_results:
+                cv = cv_results[name]
+                results_lines.append(
+                    f"| {name} | {cv['accuracy_mean']*100:.2f}% ± {cv['accuracy_std']*100:.2f}% | "
+                    f"{cv['precision_mean']*100:.2f}% ± {cv['precision_std']*100:.2f}% | "
+                    f"{cv['recall_mean']*100:.2f}% ± {cv['recall_std']*100:.2f}% | "
+                    f"{cv['f1_mean']*100:.2f}% ± {cv['f1_std']*100:.2f}% | {cv['n_folds']} |"
+                )
+        
+        results_lines.extend([
+            "",
+            "**Note**: Cross-validation provides a more robust estimate of model performance by testing on multiple time-based splits. The standard deviation indicates stability across different time periods.",
+            "",
+        ])
+    
+    results_lines.extend([
+        "",
+        "## Analysis",
+        "",
+    ])
+    
+    # Add analysis insights
+    tech_acc = results['Technical Only']['accuracy']
+    sent_acc = results['Sentiment Only']['accuracy']
+    comb_acc = results['Technical + Sentiment']['accuracy']
+    
+    results_lines.append(f"### Key Findings")
+    results_lines.append("")
+    results_lines.append(f"1. **Technical-only model accuracy**: {tech_acc*100:.2f}%")
+    results_lines.append(f"2. **Sentiment-only model accuracy**: {sent_acc*100:.2f}%")
+    results_lines.append(f"3. **Combined model accuracy**: {comb_acc*100:.2f}%")
+    results_lines.append("")
+    
+    if tech_acc > sent_acc:
+        diff = (tech_acc - sent_acc) * 100
+        results_lines.append(f"- Technical indicators **outperform** sentiment alone by {diff:.2f} percentage points")
+    else:
+        diff = (sent_acc - tech_acc) * 100
+        results_lines.append(f"- Sentiment features **outperform** technical indicators by {diff:.2f} percentage points")
+    
+    if comb_acc > max(tech_acc, sent_acc):
+        improvement = (comb_acc - max(tech_acc, sent_acc)) * 100
+        results_lines.append(f"- Combining features **improves** performance by {improvement:.2f} percentage points")
+    else:
+        results_lines.append(f"- Combining features does **not improve** over the best individual model")
+    
+    results_lines.append("")
+    results_lines.append(f"### Marginal Contribution of Sentiment")
+    results_lines.append("")
+    
+    if comb_acc > tech_acc:
+        marginal = (comb_acc - tech_acc) * 100
+        results_lines.append(f"Adding sentiment to technical indicators provides a **+{marginal:.2f}pp** improvement.")
+    elif comb_acc < tech_acc:
+        marginal = (tech_acc - comb_acc) * 100
+        results_lines.append(f"Adding sentiment to technical indicators **decreases** performance by {marginal:.2f}pp.")
+    else:
+        results_lines.append(f"Adding sentiment to technical indicators provides **no change** in accuracy.")
+    
+    # Add statistical significance section
+    results_lines.extend([
+        "",
+        "## Statistical Significance",
+        "",
+        "**McNemar's Test** (tests if model differences are statistically significant):",
+        "",
+    ])
+    
+    if 'Technical vs Combined' in mcnemar_results and mcnemar_results['Technical vs Combined'] is not None:
+        tech_result = mcnemar_results['Technical vs Combined']
+        p_val = tech_result['p_value']
+        results_lines.append(f"### Technical Only vs Combined")
+        results_lines.append("")
+        results_lines.append(f"- Technical correct, Combined wrong: {tech_result['tech_right_comb_wrong']} cases")
+        results_lines.append(f"- Technical wrong, Combined correct: {tech_result['tech_wrong_comb_right']} cases")
+        results_lines.append(f"- **p-value: {p_val:.4f}**")
+        
+        if p_val < 0.001:
+            results_lines.append(f"- **Result**: Highly significant difference (p < 0.001) ✓✓✓")
+        elif p_val < 0.01:
+            results_lines.append(f"- **Result**: Very significant difference (p < 0.01) ✓✓")
+        elif p_val < 0.05:
+            results_lines.append(f"- **Result**: Statistically significant difference (p < 0.05) ✓")
+        else:
+            results_lines.append(f"- **Result**: No significant difference (p >= 0.05)")
+        results_lines.append("")
+    
+    if 'Sentiment vs Combined' in mcnemar_results and mcnemar_results['Sentiment vs Combined'] is not None:
+        sent_result = mcnemar_results['Sentiment vs Combined']
+        p_val = sent_result['p_value']
+        results_lines.append(f"### Sentiment Only vs Combined")
+        results_lines.append("")
+        results_lines.append(f"- Sentiment correct, Combined wrong: {sent_result['sent_right_comb_wrong']} cases")
+        results_lines.append(f"- Sentiment wrong, Combined correct: {sent_result['sent_wrong_comb_right']} cases")
+        results_lines.append(f"- **p-value: {p_val:.4f}**")
+        
+        if p_val < 0.001:
+            results_lines.append(f"- **Result**: Highly significant difference (p < 0.001) ✓✓✓")
+        elif p_val < 0.01:
+            results_lines.append(f"- **Result**: Very significant difference (p < 0.01) ✓✓")
+        elif p_val < 0.05:
+            results_lines.append(f"- **Result**: Statistically significant difference (p < 0.05) ✓")
+        else:
+            results_lines.append(f"- **Result**: No significant difference (p >= 0.05)")
+        results_lines.append("")
+
+    if 'Technical vs Sentiment' in mcnemar_results and mcnemar_results['Technical vs Sentiment'] is not None:
+        ts_result = mcnemar_results['Technical vs Sentiment']
+        p_val = ts_result['p_value']
+        results_lines.append(f"### Technical Only vs Sentiment Only")
+        results_lines.append("")
+        results_lines.append(f"- Technical correct, Sentiment wrong: {ts_result['tech_right_sent_wrong']} cases")
+        results_lines.append(f"- Technical wrong, Sentiment correct: {ts_result['tech_wrong_sent_right']} cases")
+        results_lines.append(f"- **p-value: {p_val:.4f}**")
+
+        if p_val < 0.001:
+            results_lines.append(f"- **Result**: Highly significant difference (p < 0.001) ✓✓✓")
+        elif p_val < 0.01:
+            results_lines.append(f"- **Result**: Very significant difference (p < 0.01) ✓✓")
+        elif p_val < 0.05:
+            results_lines.append(f"- **Result**: Statistically significant difference (p < 0.05) ✓")
+        else:
+            results_lines.append(f"- **Result**: No significant difference (p >= 0.05)")
+        results_lines.append("")
+
+    results_lines.append("**Interpretation**: McNemar's test compares two models on the same test cases. A p-value < 0.05 means the performance difference is statistically significant (not due to chance).")
+    
+    results_lines.extend([
+        "",
+        "## Detailed Classification Reports",
+        "",
+    ])
+    
+    for name in ['Technical Only', 'Sentiment Only', 'Technical + Sentiment']:
+        results_lines.extend([
+            f"### {name}",
+            "",
+            "```",
+            classification_reports[name].strip(),
+            "```",
+            "",
+        ])
+    
+    results_lines.extend([
+        "## Confusion Matrices",
+        "",
+        f"- Technical Only: `confusion_matrix_technical_{cm_suffix}.png`",
+        f"- Sentiment Only: `confusion_matrix_sentiment_{cm_suffix}.png`",
+        f"- Technical + Sentiment: `confusion_matrix_combined_{cm_suffix}.png`",
+        "",
+        "---",
+        "",
+        f"**Generated**: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}",
+    ])
+    
+    # Save comparison results
     results_path.parent.mkdir(parents=True, exist_ok=True)
     results_path.write_text("\n".join(results_lines), encoding="utf-8")
-    print(f"Model metrics saved to '{results_path}'")
-
-    # Store the confusion matrix figure for the thesis appendices.
-    fig, ax = plt.subplots(figsize=(4.5, 4))
-    disp = ConfusionMatrixDisplay(
-        confusion_matrix=cm,
-        display_labels=["Down/Flat", "Up"],
-    )
-    disp.plot(ax=ax, cmap="Blues", colorbar=False, values_format="d")
-    ax.set_title("Logistic Regression Confusion Matrix")
-    plt.tight_layout()
-    confusion_matrix_path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(confusion_matrix_path, dpi=300)
-    plt.close(fig)
-    print(f"Confusion matrix saved to '{confusion_matrix_path}'")
+    print(f"\n{'='*60}")
+    print(f"Comparison results saved to '{results_path}'")
+    print(f"{'='*60}")
 
 
 # --- Orchestration -------------------------------------------------------------------
 def main() -> None:
     stock_data = fetch_stock_data(STOCK_SYMBOL, START_DATE, END_DATE)
 
-    headlines = scrape_current_headlines(QUOTE_URL, APPLE_KEYWORDS)
-    tokenizer, model = load_finbert_model()
-
-    live_sentiment_df = analyze_headlines(headlines, tokenizer, model)
-    if not live_sentiment_df.empty:
-        print("\nSentiment Analysis Summary (Live Headlines):")
-        print(live_sentiment_df[["date", "headline", "sentiment", "positive", "negative", "neutral"]])
-        live_output_path = PROJECT_ROOT / "results" / "apple_sentiment_analysis.csv"
-        live_output_path.parent.mkdir(parents=True, exist_ok=True)
-        live_sentiment_df.to_csv(live_output_path, index=False)
-        print(f"\nResults saved to '{live_output_path}'")
-
-    historical_headlines_df = load_historical_headlines(HISTORICAL_HEADLINES_PATH)
-    historical_records = (
-        historical_headlines_df.to_dict("records") if not historical_headlines_df.empty else []
+    # ── Historical sentiment: load from cache if up-to-date, else score with FinBERT ──
+    # Determine which source CSV will actually be read (mirrors load_historical_headlines logic).
+    source_path = (
+        HISTORICAL_HEADLINES_PATH
+        if HISTORICAL_HEADLINES_PATH.exists()
+        else HISTORICAL_HEADLINES_FALLBACK
     )
-    historical_sentiment_df = analyze_headlines(
-        historical_records,
-        tokenizer,
-        model,
-        source_label="historical Apple headlines",
+    cache_valid = (
+        HISTORICAL_SENTIMENT_OUTPUT.exists()
+        and source_path.exists()
+        and HISTORICAL_SENTIMENT_OUTPUT.stat().st_mtime >= source_path.stat().st_mtime
     )
 
-    if not historical_sentiment_df.empty:
-        print("\nSentiment Analysis Summary (Historical Headlines):")
-        print(
-            historical_sentiment_df[
-                ["date", "headline", "sentiment", "positive", "negative", "neutral"]
-            ].head()
+    if cache_valid:
+        print(f"\nLoading cached sentiment scores from '{HISTORICAL_SENTIMENT_OUTPUT}'...")
+        historical_sentiment_df = pd.read_csv(HISTORICAL_SENTIMENT_OUTPUT)
+        historical_sentiment_df["date"] = pd.to_datetime(
+            historical_sentiment_df["date"], errors="coerce"
         )
-        HISTORICAL_SENTIMENT_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-        historical_sentiment_df.to_csv(HISTORICAL_SENTIMENT_OUTPUT, index=False)
-        print(f"\nResults saved to '{HISTORICAL_SENTIMENT_OUTPUT}'")
+        print(
+            f"Loaded {len(historical_sentiment_df)} cached records. "
+            "Skipping FinBERT re-scoring."
+        )
+    else:
+        historical_headlines_df = load_historical_headlines(HISTORICAL_HEADLINES_PATH)
+        historical_records = (
+            historical_headlines_df.to_dict("records")
+            if not historical_headlines_df.empty
+            else []
+        )
+        tokenizer, model = load_finbert_model()
+        historical_sentiment_df = analyze_headlines(
+            historical_records,
+            tokenizer,
+            model,
+            source_label="historical Apple headlines",
+        )
+        if not historical_sentiment_df.empty:
+            print("\nSentiment Analysis Summary (Historical Headlines):")
+            print(
+                historical_sentiment_df[
+                    ["date", "headline", "sentiment", "positive", "negative", "neutral"]
+                ].head()
+            )
+            HISTORICAL_SENTIMENT_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+            historical_sentiment_df.to_csv(HISTORICAL_SENTIMENT_OUTPUT, index=False)
+            print(f"\nCached sentiment scores saved to '{HISTORICAL_SENTIMENT_OUTPUT}'")
 
-    daily_sentiment_df = aggregate_daily_sentiment([live_sentiment_df, historical_sentiment_df])
-    merged_dataset = merge_sentiment_with_stock(daily_sentiment_df, stock_data)
-    if not merged_dataset.empty:
-        columns_to_export = [
+    daily_sentiment_df = aggregate_daily_sentiment([historical_sentiment_df])
+
+    # ── Experiment 1: Next-Day Prediction ────────────────────────────────────────────
+    # Features: sentiment(t) + technicals(t)
+    # Target:   Close(t+1) > Close(t)
+    print("\n" + "="*80)
+    print("EXPERIMENT 1: NEXT-DAY PREDICTION")
+    print("Target: Will tomorrow's close be higher than today's close?")
+    print("Features: same-day sentiment + same-day technical indicators")
+    print("="*80)
+
+    merged_nextday = merge_sentiment_with_stock(daily_sentiment_df, stock_data)
+    if not merged_nextday.empty:
+        columns_to_export_nextday = [
             "date",
             "avg_positive",
             "avg_negative",
@@ -549,15 +1329,84 @@ def main() -> None:
             "headline_count",
             "close",
             "next_close",
-            "stock_move",
+            "stock_move_nextday",
+            "return_1d",
+            "price_vs_sma20",
+            "rsi_change",
         ]
         AGGREGATED_DATA_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-        merged_dataset[columns_to_export].to_csv(AGGREGATED_DATA_OUTPUT, index=False)
-        print(f"\nAggregated dataset saved to '{AGGREGATED_DATA_OUTPUT}'")
+        merged_nextday[columns_to_export_nextday].to_csv(AGGREGATED_DATA_OUTPUT, index=False)
+        print(f"\nNext-day dataset saved to '{AGGREGATED_DATA_OUTPUT}'")
 
-        train_baseline_model(merged_dataset, MODEL_RESULTS_PATH, CONFUSION_MATRIX_PATH)
+        cv_results_nextday = evaluate_models_with_cv(
+            merged_nextday,
+            target_column='stock_move_nextday',
+            prediction_type='Next-Day',
+            n_splits=5,
+            # technical_features not passed → defaults to non-lagged names
+        )
+
+        train_comparison_models(
+            merged_nextday,
+            MODEL_COMPARISON_RESULTS,
+            CONFUSION_MATRIX_PATH,
+            target_column='stock_move_nextday',
+            prediction_type='Next-Day',
+            cv_results=cv_results_nextday,
+            # technical_features not passed → defaults to non-lagged names
+            cm_suffix='nextday',
+        )
     else:
-        print("Aggregated dataset was not generated.")
+        print("Next-day dataset was not generated.")
+
+    # ── Experiment 2: Intraday Prediction ────────────────────────────────────────────
+    # Features: sentiment(t) [same-day] + technicals(t-1) [lagged one trading day]
+    # Target:   Close(t) > Open(t)
+    print("\n" + "="*80)
+    print("EXPERIMENT 2: INTRADAY PREDICTION")
+    print("Target: Will today's close be higher than today's open?")
+    print("Features: same-day sentiment + overnight gap + at-open technical indicators")
+    print("="*80)
+
+    merged_intraday = merge_sentiment_with_stock_intraday(daily_sentiment_df, stock_data)
+    if not merged_intraday.empty:
+        columns_to_export_intraday = [
+            "date",
+            "avg_positive",
+            "avg_negative",
+            "avg_neutral",
+            "headline_count",
+            "open",
+            "close",
+            "stock_move_intraday",
+            "overnight_gap",
+            "open_vs_sma20",
+            "rsi_change_lag1",
+        ]
+        INTRADAY_DATA_OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+        merged_intraday[columns_to_export_intraday].to_csv(INTRADAY_DATA_OUTPUT, index=False)
+        print(f"\nIntraday dataset saved to '{INTRADAY_DATA_OUTPUT}'")
+
+        cv_results_intraday = evaluate_models_with_cv(
+            merged_intraday,
+            target_column='stock_move_intraday',
+            prediction_type='Intraday',
+            n_splits=5,
+            technical_features=['overnight_gap', 'open_vs_sma20', 'rsi_change_lag1'],
+        )
+
+        train_comparison_models(
+            merged_intraday,
+            INTRADAY_COMPARISON_RESULTS,
+            INTRADAY_CONFUSION_MATRIX,
+            target_column='stock_move_intraday',
+            prediction_type='Intraday',
+            cv_results=cv_results_intraday,
+            technical_features=['overnight_gap', 'open_vs_sma20', 'rsi_change_lag1'],
+            cm_suffix='intraday',
+        )
+    else:
+        print("Intraday dataset was not generated.")
 
 
 if __name__ == "__main__":
