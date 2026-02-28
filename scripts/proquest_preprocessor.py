@@ -8,10 +8,10 @@ Usage:
 
 Features:
     - Merges multiple ProQuest export batches
+    - Infers output filename from input (nvidia, sp500, apple)
+    - Outputs to data/processed/wsj_{entity}_proquest.csv
     - Cleans and standardizes date formats
     - Removes duplicates
-    - Validates data structure
-    - Outputs to data/wsj_apple_proquest.csv
 """
 
 from pathlib import Path
@@ -172,17 +172,22 @@ def display_summary(df: pd.DataFrame) -> None:
 
 def main():
     """Main preprocessing workflow."""
-    # Directory containing ProQuest exports
-    data_dir = Path("../data/raw")
-    data_dir.mkdir(exist_ok=True)
+    # Paths relative to script location (works regardless of cwd)
+    script_dir = Path(__file__).resolve().parent
+    project_root = script_dir.parent
+    data_dir = project_root / "data" / "raw"
+    data_dir.mkdir(parents=True, exist_ok=True)
     
     # Look for ProQuest export files (you can add multiple batches here)
     # Common naming patterns for ProQuest exports
     proquest_patterns = [
         "proquest*.csv",
-        "wsj*.csv",
         "*proquest*.csv",
-        "export*.csv"
+        "ProQuest*.csv",
+        "wsj*.csv",
+        "S&P*.csv",
+        "*S&P*.csv",
+        "export*.csv",
     ]
     
     input_files = []
@@ -191,12 +196,27 @@ def main():
     
     # Remove duplicates (same file matched by multiple patterns)
     input_files = list(set(input_files))
-    
-    # Exclude our output file if it exists
-    output_path = Path("../data/processed/wsj_apple_proquest.csv")
-    input_files = [f for f in input_files if f != output_path]
-    
-    if not input_files:
+
+    # Group files by inferred entity (output filename derived from input)
+    def infer_entity(path: Path) -> str:
+        name = path.stem.lower()
+        if "nvidia" in name or "nvdia" in name:
+            return "nvidia"
+        if "sp500" in name or "s&p" in name:
+            return "sp500"
+        return "apple"
+
+    # Group by entity and exclude any file that IS an output (safety)
+    output_dir = project_root / "data" / "processed"
+    output_files = {output_dir / f"wsj_{e}_proquest.csv" for e in ("apple", "nvidia", "sp500")}
+    input_files = [f for f in input_files if f not in output_files]
+
+    groups: dict[str, list[Path]] = {}
+    for f in input_files:
+        entity = infer_entity(f)
+        groups.setdefault(entity, []).append(f)
+
+    if not groups:
         print("❌ No ProQuest export files found in data/raw/ directory.")
         print("\nExpected file patterns:")
         for pattern in proquest_patterns:
@@ -206,23 +226,23 @@ def main():
         print("  2. Save the CSV file(s) to the data/raw/ directory")
         print("  3. Run this script again")
         return
-    
-    print(f"Found {len(input_files)} ProQuest export file(s):")
-    for f in input_files:
-        print(f"  - {f.name}")
+
+    print(f"Found {sum(len(v) for v in groups.values())} ProQuest export file(s) in {len(groups)} group(s):")
+    for entity, paths in groups.items():
+        print(f"  [{entity}] → wsj_{entity}_proquest.csv")
+        for f in paths:
+            print(f"    - {f.name}")
     print()
-    
+
     try:
-        # Process and merge all files
-        merged_df = merge_proquest_batches(input_files)
-        
-        # Display summary
-        display_summary(merged_df)
-        
-        # Save to output
-        merged_df.to_csv(output_path, index=False)
-        print(f"✅ Processed data saved to: {output_path}")
-        print(f"\nYou can now run 'python scripts/main.py' to analyze this dataset!")
+        for entity, paths in groups.items():
+            output_path = output_dir / f"wsj_{entity}_proquest.csv"
+            merged_df = merge_proquest_batches(paths)
+            display_summary(merged_df)
+            merged_df.to_csv(output_path, index=False)
+            print(f"✅ {entity}: saved to {output_path}")
+
+        print(f"\nYou can now run your main pipeline to analyze these datasets!")
         
     except Exception as e:
         print(f"\n❌ Error during preprocessing: {e}")
